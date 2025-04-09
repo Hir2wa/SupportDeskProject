@@ -39,66 +39,48 @@ public class UserController {
         }
     }
 
-    // ✅ Login (returns userId after successful login)
-// In UserController
-public boolean loginUser(String username, String password) {
-    String sql = "SELECT * FROM users WHERE username = ?";
-
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setString(1, username);
-        ResultSet rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            String storedPass = rs.getString("password");
-            if (password.equals(storedPass)) {
-                return true; // Return true if login is successful
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return false; // Return false if login fails
-}
-
-
-    // 🛠️ Update user stats
-    public boolean updateUserStats(User user) {
-        String sql = "UPDATE users SET issues_submitted = ?, likes_received = ?, comments_received = ?, comments_made = ? WHERE username = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, user.getIssuesSubmitted());
-            stmt.setInt(2, user.getLikesReceived());
-            stmt.setInt(3, user.getCommentsReceived());
-            stmt.setInt(4, user.getCommentsMade());
-            stmt.setString(5, user.getUsername());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 📦 Fetch a user object (e.g., for profile or dashboard)
-    public User getUserByUsername(String username) {
+    // ✅ Login (returns true for successful login)
+    public boolean loginUser(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ?";
-    
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
-    
+
             if (rs.next()) {
-                return new User(
-                    rs.getInt("id"), // Return the userId
+                String storedPass = rs.getString("password");
+                if (password.equals(storedPass)) {
+                    return true; // Return true if login is successful
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Return false if login fails
+    }
+
+    // 📦 Fetch a user object by username
+    public User getUserByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User(
+                    rs.getInt("id"),
                     rs.getString("full_name"),
                     rs.getString("username"),
                     rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getInt("issues_submitted"),
-                    rs.getInt("likes_received"),
-                    rs.getInt("comments_received"),
-                    rs.getInt("comments_made"),
-                    rs.getString("like_status") // Assuming `like_status` exists in the database
+                    rs.getString("password")
                 );
+                
+                // Optional: Set timestamps if you need them
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                
+                return user;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -106,4 +88,32 @@ public boolean loginUser(String username, String password) {
         return null;
     }
     
+    // 📦 Fetch a user object by ID
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("full_name"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password")
+                );
+                
+                // Optional: Set timestamps if you need them
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

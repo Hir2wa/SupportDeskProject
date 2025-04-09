@@ -3,9 +3,11 @@ package View;
 import javax.swing.*;
 
 import Controller.IssueController;
+import Controller.UserController;
 import model.Issue;
 import model.Like;
 import model.Comment;
+import model.User;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,12 +20,14 @@ public class HomePageView {
     private JPanel postsPanel;
     private String username;
     private IssueController issueController;
-    private int userId; // We'll need to track the user ID
+    private UserController userController;
+    private int userId;
 
     public HomePageView(String username, ImageIcon profilePic) {
         this.username = username;
         this.issueController = new IssueController();
-        this.userId = getUserIdFromUsername(username); // You'll need to implement this method
+        this.userController = new UserController();
+        this.userId = getUserIdFromUsername(username);
         
         // ==== Frame setup ====
         homeFrame = new JFrame("Support Desk - Home");
@@ -146,11 +150,14 @@ public class HomePageView {
         loadIssues();
     }
     
-    // Method to get user ID from username - you need to implement this
+    // Updated method to get user ID from username using the database
     private int getUserIdFromUsername(String username) {
-        // In a real application, you would query the database to get the user ID
-        // For now, let's return a placeholder value
-        return 1; // Replace with actual implementation
+        User user = userController.getUserByUsername(username);
+        if (user != null) {
+            return user.getId();
+        }
+        System.out.println("Warning: User not found for username: " + username);
+        return -1;
     }
     
     // Method to load existing issues from database
@@ -168,8 +175,16 @@ public class HomePageView {
         } else {
             // For each issue, create a post panel
             for (Issue issue : issues) {
-                // In reality, you'd get the username based on the user_id
-                String posterUsername = (issue.getUserId() == userId) ? username : "User #" + issue.getUserId();
+                // Get the actual username for each post based on user_id
+                String posterUsername;
+                if (issue.getUserId() == userId) {
+                    posterUsername = username; // Current user's post
+                } else {
+                    // Fetch the username from the database based on the user_id
+                    User posterUser = userController.getUserById(issue.getUserId());
+                    posterUsername = posterUser != null ? posterUser.getUsername() : "Unknown User #" + issue.getUserId();
+                }
+                
                 JPanel postPanel = createPostPanel(issue.getDescription(), posterUsername, "Earlier", issue.getId());
                 postsPanel.add(postPanel);
             }
@@ -232,7 +247,7 @@ public class HomePageView {
                     // Create Like object
                     Like like = new Like(issueId, this.username);
                     
-                    // Save to database
+                    // Save to database - pass actual userId
                     boolean likeAdded = issueController.likeIssue(like, userId);
                     
                     if (!likeAdded) {
@@ -316,7 +331,7 @@ public class HomePageView {
                 comment.setIssueId(issueId);
                 comment.setContent(commentText);
                 
-                // Save to database
+                // Save to database with the actual userId
                 boolean commentAdded = issueController.addComment(comment, userId);
                 
                 if (commentAdded) {
@@ -344,6 +359,4 @@ public class HomePageView {
     
         return postPanel;
     }
-
-
 }

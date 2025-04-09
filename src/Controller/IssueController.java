@@ -25,18 +25,25 @@ public class IssueController {
     }
 
     // Post new issue (updated to include user_id)
-    public boolean postIssue(Issue issue, int userId) {
-        String sql = "INSERT INTO issues (user_id, title, description) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, userId); // Using user_id from method argument
-            stmt.setString(2, issue.getTitle());
-            stmt.setString(3, issue.getDescription());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+  // Example of improved error logging in postIssue method
+public boolean postIssue(Issue issue, int userId) {
+    String sql = "INSERT INTO issues (user_id, title, description) VALUES (?, ?, ?)";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        System.out.println("Attempting to insert issue: " + issue.getTitle());
+        System.out.println("User ID: " + userId);
+        stmt.setInt(1, userId);
+        stmt.setString(2, issue.getTitle());
+        stmt.setString(3, issue.getDescription());
+        int result = stmt.executeUpdate();
+        System.out.println("Insert result: " + result);
+        return result > 0;
+    } catch (SQLException e) {
+        System.out.println("SQL ERROR: " + e.getMessage());
+        System.out.println("SQL State: " + e.getSQLState());
+        e.printStackTrace();
+        return false;
     }
+}
 
     // Get all issues\
     public List<Issue> getAllIssues() {
@@ -47,11 +54,16 @@ public class IssueController {
             while (rs.next()) {
                 issues.add(new Issue(
                     rs.getInt("id"),
+                    rs.getInt("user_id"),
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getInt("user_id") // Capture the user_id as well
+                    rs.getString("status"),
+                    rs.getTimestamp("created_at"),
+                    rs.getTimestamp("updated_at"),
+                    rs.getInt("likes")
                 ));
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -84,4 +96,5 @@ public class IssueController {
             return false;
         }
     }
+    
 }

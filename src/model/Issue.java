@@ -1,57 +1,102 @@
 package model;
 
+import java.sql.Timestamp;
+
 public class Issue {
     private int id;
+    private int userId;
     private String title;
     private String description;
-    private int userId; // Changed from String username to int userId
-
+    private String status;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    private int likes;
+    
+    // Constructors
     public Issue() {}
-
-    // Constructor with userId instead of username
-    public Issue(int id, String title, String description, int userId) {
-        this.id = id;
+    
+    public Issue(int userId, String title, String description) {
+        this.userId = userId;
         this.title = title;
         this.description = description;
-        this.userId = userId;
+        this.status = "open"; // Default value
+        this.likes = 0;       // Default value
     }
+    public Issue(int id, int userId, String title, String description, String status,
+             Timestamp createdAt, Timestamp updatedAt, int likes) {
+    this.id = id;
+    this.userId = userId;
+    this.title = title;
+    this.description = description;
+    this.status = status;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.likes = likes;
+}
 
-    // Constructor without id, suitable for posting a new issue
-    public Issue(String title, String description, int userId) {
-        this.title = title;
-        this.description = description;
-        this.userId = userId;
-    }
-
+    
+    // Getters and setters
     public int getId() {
         return id;
     }
-
+    
     public void setId(int id) {
         this.id = id;
     }
-
+    
+    public int getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
     public String getTitle() {
         return title;
     }
-
+    
     public void setTitle(String title) {
         this.title = title;
     }
-
+    
     public String getDescription() {
         return description;
     }
-
+    
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public int getUserId() { // Getter for userId
-        return userId;
+    
+    public String getStatus() {
+        return status;
     }
-
-    public void setUserId(int userId) { // Setter for userId
-        this.userId = userId;
+    
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    
+    public int getLikes() {
+        return likes;
+    }
+    
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 }
