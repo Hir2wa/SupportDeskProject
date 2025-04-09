@@ -1,16 +1,30 @@
 package View;
 
 import javax.swing.*;
+
+import Controller.IssueController;
+import model.Issue;
+import model.Like;
+import model.Comment;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class HomePageView {
 
     private JFrame homeFrame;
     private JPanel postsPanel;
+    private String username;
+    private IssueController issueController;
+    private int userId; // We'll need to track the user ID
 
     public HomePageView(String username, ImageIcon profilePic) {
+        this.username = username;
+        this.issueController = new IssueController();
+        this.userId = getUserIdFromUsername(username); // You'll need to implement this method
+        
         // ==== Frame setup ====
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +99,9 @@ public class HomePageView {
 
         // Add components to center panel
         centerPanel.add(scrollPane);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         centerPanel.add(postButton);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(postsPanel);
 
         // ==== Final Setup ====
@@ -101,45 +117,95 @@ public class HomePageView {
             public void actionPerformed(ActionEvent e) {
                 String postText = newPostTextArea.getText().trim();
                 if (!postText.isEmpty()) {
-                    // Create a new post panel
-                    JPanel newPostPanel = createPostPanel(postText, username, "Just Now");
-                    postsPanel.add(newPostPanel);
-                    postsPanel.revalidate();
-                    postsPanel.repaint();
-
-                    // Clear the text area after posting
-                    newPostTextArea.setText("");
+                    // Create Issue object
+                    Issue newIssue = new Issue();
+                    newIssue.setTitle("New Issue by " + username); // Default title
+                    newIssue.setDescription(postText);
+                    newIssue.setUserId(userId);
+                    
+                    // Save to database using controller
+                    boolean posted = issueController.postIssue(newIssue, userId);
+                    
+                    if (posted) {
+                        // If successfully posted, load all issues again
+                        loadIssues();
+                        
+                        // Clear the text area after posting
+                        newPostTextArea.setText("");
+                        JOptionPane.showMessageDialog(homeFrame, "Issue posted successfully!");
+                    } else {
+                        JOptionPane.showMessageDialog(homeFrame, 
+                            "Failed to post issue. Please check database connection.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
+        
+        // Load existing issues on startup
+        loadIssues();
     }
-
-    private void saveToDB(String post, int likes, int dislikes) {
-        System.out.println("Saving post stats to DB → " + post);
-        System.out.println("Likes: " + likes + " | Dislikes: " + dislikes);
+    
+    // Method to get user ID from username - you need to implement this
+    private int getUserIdFromUsername(String username) {
+        // In a real application, you would query the database to get the user ID
+        // For now, let's return a placeholder value
+        return 1; // Replace with actual implementation
     }
-
-    private void saveCommentToDB(String post, String comment) {
-        System.out.println("Saving comment to DB for post: " + post);
-        System.out.println("Comment: " + comment);
+    
+    // Method to load existing issues from database
+    private void loadIssues() {
+        // Clear existing posts
+        postsPanel.removeAll();
+        
+        // Get issues from controller
+        List<Issue> issues = issueController.getAllIssues();
+        
+        if (issues.isEmpty()) {
+            JLabel noIssuesLabel = new JLabel("No issues found. Be the first to post one!");
+            noIssuesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            postsPanel.add(noIssuesLabel);
+        } else {
+            // For each issue, create a post panel
+            for (Issue issue : issues) {
+                // In reality, you'd get the username based on the user_id
+                String posterUsername = (issue.getUserId() == userId) ? username : "User #" + issue.getUserId();
+                JPanel postPanel = createPostPanel(issue.getDescription(), posterUsername, "Earlier", issue.getId());
+                postsPanel.add(postPanel);
+            }
+        }
+        
+        postsPanel.revalidate();
+        postsPanel.repaint();
     }
 
     // Helper method to create individual post panels
-    // Helper method to create individual post panels
-    private JPanel createPostPanel(String postText, String username, String timeAgo) {
+    private JPanel createPostPanel(String postText, String username, String timeAgo, int issueId) {
         JPanel postPanel = new JPanel();
         postPanel.setLayout(new BoxLayout(postPanel, BoxLayout.Y_AXIS));
         postPanel.setBackground(Color.WHITE);
         postPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        postPanel.setMaximumSize(new Dimension(700, 300));
         postPanel.setPreferredSize(new Dimension(700, 180));
     
         // ==== Post Content ====
-        JLabel postContent = new JLabel("<html>" + postText + "</html>");
+        JLabel postContent = new JLabel("<html><body width='650'>" + postText + "</body></html>");
         postContent.setFont(new Font("Arial", Font.PLAIN, 14));
+        postContent.setAlignmentX(Component.LEFT_ALIGNMENT);
     
         // ==== Info ====
-        JLabel postInfo = new JLabel("Posted by: " + username + " • " + timeAgo);
+        JLabel postInfo = new JLabel("Posted by: " + username + " • " + timeAgo + " (Issue #" + issueId + ")");
         postInfo.setFont(new Font("Arial", Font.ITALIC, 12));
+        postInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        // Add padding
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.add(postContent);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        contentPanel.add(postInfo);
     
         // ==== Like/Dislike Buttons and Logic ====
         JButton likeButton = new JButton("Like 👍");
@@ -161,15 +227,43 @@ public class HomePageView {
                     disliked[0] = false;
                 }
                 liked[0] = true;
+
+                try {
+                    // Create Like object
+                    Like like = new Like(issueId, this.username);
+                    
+                    // Save to database
+                    boolean likeAdded = issueController.likeIssue(like, userId);
+                    
+                    if (!likeAdded) {
+                        JOptionPane.showMessageDialog(homeFrame, 
+                            "Failed to register like. Please try again.", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                        // Revert UI changes if database operation failed
+                        likeCount[0]--;
+                        liked[0] = false;
+                        return;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(homeFrame, 
+                        "Error: " + ex.getMessage(), 
+                        "Like Error", JOptionPane.ERROR_MESSAGE);
+                    // Revert UI changes if exception occurred
+                    likeCount[0]--;
+                    liked[0] = false;
+                    return;
+                }
             } else {
                 likeCount[0]--;
                 liked[0] = false;
+                // You would need a method to remove likes from database
             }
+
             likeLabel.setText(likeCount[0] + " Likes");
             dislikeLabel.setText(dislikeCount[0] + " Dislikes");
-            saveToDB(postText, likeCount[0], dislikeCount[0]); // mock save
         });
-    
+
         dislikeButton.addActionListener(e -> {
             if (!disliked[0]) {
                 dislikeCount[0]++;
@@ -178,13 +272,18 @@ public class HomePageView {
                     liked[0] = false;
                 }
                 disliked[0] = true;
+
+                // You would need to implement dislikeIssue in the controller
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "Dislike functionality not implemented yet.", 
+                    "Notice", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 dislikeCount[0]--;
                 disliked[0] = false;
             }
+
             likeLabel.setText(likeCount[0] + " Likes");
             dislikeLabel.setText(dislikeCount[0] + " Dislikes");
-            saveToDB(postText, likeCount[0], dislikeCount[0]); // mock save
         });
     
         JPanel interactionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -193,34 +292,51 @@ public class HomePageView {
         interactionPanel.add(likeLabel);
         interactionPanel.add(dislikeButton);
         interactionPanel.add(dislikeLabel);
+        interactionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     
         // ==== Comment Section ====
         JLabel commentsTitle = new JLabel("Comments:");
+        commentsTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
         JTextArea commentsArea = new JTextArea(3, 60);
         commentsArea.setEditable(false);
         commentsArea.setLineWrap(true);
         commentsArea.setWrapStyleWord(true);
         JScrollPane commentScroll = new JScrollPane(commentsArea);
+        commentScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
     
         JTextField commentInput = new JTextField(50);
         JButton submitComment = new JButton("Post Comment");
     
         submitComment.addActionListener(e -> {
-            String comment = commentInput.getText().trim();
-            if (!comment.isEmpty()) {
-                commentsArea.append(username + ": " + comment + "\n");
-                commentInput.setText("");
-                saveCommentToDB(postText, comment); // mock save
+            String commentText = commentInput.getText().trim();
+            if (!commentText.isEmpty()) {
+                // Create Comment object
+                Comment comment = new Comment();
+                comment.setIssueId(issueId);
+                comment.setContent(commentText);
+                
+                // Save to database
+                boolean commentAdded = issueController.addComment(comment, userId);
+                
+                if (commentAdded) {
+                    commentsArea.append(this.username + ": " + commentText + "\n");
+                    commentInput.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(homeFrame, 
+                        "Failed to post comment. Please try again.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     
         JPanel commentInputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         commentInputPanel.add(commentInput);
         commentInputPanel.add(submitComment);
+        commentInputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     
         // ==== Add to Post Panel ====
-        postPanel.add(postContent);
-        postPanel.add(postInfo);
+        postPanel.add(contentPanel);
         postPanel.add(interactionPanel);
         postPanel.add(commentsTitle);
         postPanel.add(commentScroll);
@@ -228,10 +344,6 @@ public class HomePageView {
     
         return postPanel;
     }
-    
 
-    public static void main(String[] args) {
-        // Test the HomePageView with dummy data
-        new HomePageView("John Doe", new ImageIcon("Assets/LogoSupportDesk.png"));
-    }
+
 }
