@@ -114,7 +114,6 @@ public class AdminDashboardView {
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     fireEditingStopped();
-                    // Implement the action (e.g., Edit, Delete, Ban)
                     if (label.equals("Edit")) {
                         JOptionPane.showMessageDialog(adminFrame, "Edit User");
                     } else if (label.equals("Delete")) {
