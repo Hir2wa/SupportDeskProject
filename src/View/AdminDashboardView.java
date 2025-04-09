@@ -16,9 +16,7 @@ public class AdminDashboardView {
         adminFrame = new JFrame("Admin Dashboard");
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setSize(1000, 700);
-        adminFrame.setLocationRelativeTo(null); // Center the frame
-
-        // ==== Main Panel (with layout) ====
+        adminFrame.setLocationRelativeTo(null); 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
