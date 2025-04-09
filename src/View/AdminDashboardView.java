@@ -12,7 +12,7 @@ public class AdminDashboardView {
     private JFrame adminFrame;
     
     public AdminDashboardView() {
-        // ==== Frame Setup ====
+        
         adminFrame = new JFrame("Admin Dashboard");
         adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         adminFrame.setSize(1000, 700);
@@ -20,9 +20,8 @@ public class AdminDashboardView {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        // ==== Navigation Panel ====
         JPanel navPanel = new JPanel();
-        navPanel.setLayout(new GridLayout(1, 5)); // Horizontal buttons for navigation
+        navPanel.setLayout(new GridLayout(1, 5)); 
         JButton usersButton = new JButton("Users");
         JButton violationsButton = new JButton("Violations");
         JButton contentButton = new JButton("Content");
