@@ -38,7 +38,7 @@ public class IssueController {
         }
     }
 
-    // Get all issues
+    // Get all issues\
     public List<Issue> getAllIssues() {
         List<Issue> issues = new ArrayList<>();
         String sql = "SELECT * FROM issues ORDER BY id DESC";

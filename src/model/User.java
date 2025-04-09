@@ -1,6 +1,7 @@
 package model;
 
 public class User {
+    private int id;
     private String fullName;
     private String username;
     private String email;
@@ -9,21 +10,15 @@ public class User {
     private int likesReceived;
     private int commentsReceived;
     private int commentsMade;
+    private String likeStatus;
 
     // === Constructors ===
 
     public User() {}
 
-    public User(String fullName, String username, String email, String password) {
-        this.fullName = fullName;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-    public User(String fullName, String username, String email, String password,
-                int issuesSubmitted, int likesReceived,
-                int commentsReceived, int commentsMade) {
+    public User(int id, String fullName, String username, String email, String password,
+                int issuesSubmitted, int likesReceived, int commentsReceived, int commentsMade, String likeStatus) {
+        this.id = id;
         this.fullName = fullName;
         this.username = username;
         this.email = email;
@@ -32,9 +27,25 @@ public class User {
         this.likesReceived = likesReceived;
         this.commentsReceived = commentsReceived;
         this.commentsMade = commentsMade;
+        this.likeStatus = likeStatus;
+    }
+
+    public User(String fullName, String username, String email, String password) {
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     // === Getters and Setters ===
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getFullName() {
         return fullName;
@@ -98,5 +109,13 @@ public class User {
 
     public void setCommentsMade(int commentsMade) {
         this.commentsMade = commentsMade;
+    }
+
+    public String getLikeStatus() {
+        return likeStatus;
+    }
+
+    public void setLikeStatus(String likeStatus) {
+        this.likeStatus = likeStatus;
     }
 }

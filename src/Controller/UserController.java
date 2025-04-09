@@ -8,7 +8,6 @@ public class UserController {
 
     public UserController() {
         try {
-            // Change these values to match your DB
             String url = "jdbc:postgresql://localhost:5432/support_desk";
             String user = "postgres";
             String pass = "2003";
@@ -40,23 +39,27 @@ public class UserController {
         }
     }
 
-    // ✅ Login
-    public boolean loginUser(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ?";
+    // ✅ Login (returns userId after successful login)
+// In UserController
+public boolean loginUser(String username, String password) {
+    String sql = "SELECT * FROM users WHERE username = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setString(1, username);
+        ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String storedPass = rs.getString("password");
-                return password.equals(storedPass); // You can hash later
+        if (rs.next()) {
+            String storedPass = rs.getString("password");
+            if (password.equals(storedPass)) {
+                return true; // Return true if login is successful
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return false; // Return false if login fails
+}
+
 
     // 🛠️ Update user stats
     public boolean updateUserStats(User user) {
@@ -78,13 +81,14 @@ public class UserController {
     // 📦 Fetch a user object (e.g., for profile or dashboard)
     public User getUserByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
-
+    
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
-
+    
             if (rs.next()) {
                 return new User(
+                    rs.getInt("id"), // Return the userId
                     rs.getString("full_name"),
                     rs.getString("username"),
                     rs.getString("email"),
@@ -92,7 +96,8 @@ public class UserController {
                     rs.getInt("issues_submitted"),
                     rs.getInt("likes_received"),
                     rs.getInt("comments_received"),
-                    rs.getInt("comments_made")
+                    rs.getInt("comments_made"),
+                    rs.getString("like_status") // Assuming `like_status` exists in the database
                 );
             }
         } catch (SQLException e) {
@@ -100,4 +105,5 @@ public class UserController {
         }
         return null;
     }
+    
 }
