@@ -69,7 +69,135 @@ public boolean postIssue(Issue issue, int userId) {
         }
         return issues;
     }
+    /**
+ * Get all comments for an issue
+ * @param issueId The issue ID
+ * @return List of comments
+ */
+public List<Comment> getCommentsForIssue(int issueId) {
+    List<Comment> comments = new ArrayList<>();
+    String query = "SELECT * FROM comments WHERE issue_id = ? ORDER BY created_at ASC";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setInt(1, issueId);
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            Comment comment = new Comment();
+            comment.setId(rs.getInt("id"));
+            comment.setIssueId(rs.getInt("issue_id"));
+            comment.setUserId(rs.getInt("user_id"));
+            comment.setContent(rs.getString("content"));
+            comment.setCreatedAt(rs.getTimestamp("created_at"));
+            
+            comments.add(comment);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return comments;
+}
 
+// Add these methods to your IssueController class
+
+/**
+ * Check if a user has already liked an issue
+ * @param userId The user ID
+ * @param issueId The issue ID
+ * @return true if the user has already liked the issue, false otherwise
+ */
+public boolean hasUserLikedIssue(int userId, int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE user_id = ? AND issue_id = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setInt(1, userId);
+        stmt.setInt(2, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+/**
+ * Get the number of likes for an issue
+ * @param issueId The issue ID
+ * @return The number of likes
+ */
+public int getLikeCount(int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE issue_id = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setInt(1, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+/**
+ * Add a like to an issue if not already liked
+ * @param like The like object
+ * @param userId The user ID
+ * @return true if the like was added, false if already liked or on error
+ */
+public boolean likeIssue(Like like, int userId) {
+    // Check if already liked
+    if (hasUserLikedIssue(userId, like.getIssueId())) {
+        return false; // Already liked
+    }
+    
+    // Add the like
+    String query = "INSERT INTO likes (user_id, issue_id) VALUES (?, ?)";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setInt(1, userId);
+        stmt.setInt(2, like.getIssueId());
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+/**
+ * Remove a like from an issue
+ * @param userId The user ID
+ * @param issueId The issue ID
+ * @return true if the like was removed, false otherwise
+ */
+public boolean unlikeIssue(int userId, int issueId) {
+    String query = "DELETE FROM likes WHERE user_id = ? AND issue_id = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setInt(1, userId);
+        stmt.setInt(2, issueId);
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
     // Comment on an issue (updated to include user_id)
     public boolean addComment(Comment comment, int userId) {
         String sql = "INSERT INTO comments (issue_id, user_id, comment) VALUES (?, ?, ?)";
@@ -84,17 +212,6 @@ public boolean postIssue(Issue issue, int userId) {
         }
     }
 
-    // Like an issue (updated to include user_id)
-    public boolean likeIssue(Like like, int userId) {
-        String sql = "INSERT INTO likes (issue_id, user_id) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, like.getIssueId());
-            stmt.setInt(2, userId); // Pass user_id
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+  
     
 }
