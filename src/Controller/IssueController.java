@@ -24,13 +24,13 @@ public class IssueController {
         }
     }
 
-    // Post new issue
-    public boolean postIssue(Issue issue) {
-        String sql = "INSERT INTO issues (title, description, username) VALUES (?, ?, ?)";
+    // Post new issue (updated to include user_id)
+    public boolean postIssue(Issue issue, int userId) {
+        String sql = "INSERT INTO issues (user_id, title, description) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, issue.getTitle());
-            stmt.setString(2, issue.getDescription());
-            stmt.setString(3, issue.getUsername());
+            stmt.setInt(1, userId); // Using user_id from method argument
+            stmt.setString(2, issue.getTitle());
+            stmt.setString(3, issue.getDescription());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -49,7 +49,7 @@ public class IssueController {
                     rs.getInt("id"),
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getString("username")
+                    rs.getInt("user_id") // Capture the user_id as well
                 ));
             }
         } catch (SQLException e) {
@@ -58,12 +58,12 @@ public class IssueController {
         return issues;
     }
 
-    // Comment on an issue
-    public boolean addComment(Comment comment) {
-        String sql = "INSERT INTO comments (issue_id, username, content) VALUES (?, ?, ?)";
+    // Comment on an issue (updated to include user_id)
+    public boolean addComment(Comment comment, int userId) {
+        String sql = "INSERT INTO comments (issue_id, user_id, comment) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, comment.getIssueId());
-            stmt.setString(2, comment.getUsername());
+            stmt.setInt(2, userId); // Pass user_id
             stmt.setString(3, comment.getContent());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -72,12 +72,12 @@ public class IssueController {
         }
     }
 
-    // Like an issue
-    public boolean likeIssue(Like like) {
-        String sql = "INSERT INTO likes (issue_id, username) VALUES (?, ?)";
+    // Like an issue (updated to include user_id)
+    public boolean likeIssue(Like like, int userId) {
+        String sql = "INSERT INTO likes (issue_id, user_id) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, like.getIssueId());
-            stmt.setString(2, like.getUsername());
+            stmt.setInt(2, userId); // Pass user_id
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

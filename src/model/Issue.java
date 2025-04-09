@@ -4,21 +4,23 @@ public class Issue {
     private int id;
     private String title;
     private String description;
-    private String username;
+    private int userId; // Changed from String username to int userId
 
     public Issue() {}
 
-    public Issue(int id, String title, String description, String username) {
+    // Constructor with userId instead of username
+    public Issue(int id, String title, String description, int userId) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.username = username;
+        this.userId = userId;
     }
 
-    public Issue(String title, String description, String username) {
+    // Constructor without id, suitable for posting a new issue
+    public Issue(String title, String description, int userId) {
         this.title = title;
         this.description = description;
-        this.username = username;
+        this.userId = userId;
     }
 
     public int getId() {
@@ -45,11 +47,11 @@ public class Issue {
         this.description = description;
     }
 
-    public String getUsername() {
-        return username;
+    public int getUserId() { // Getter for userId
+        return userId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(int userId) { // Setter for userId
+        this.userId = userId;
     }
 }
