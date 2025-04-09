@@ -87,7 +87,7 @@ public class IssueController {
                 comment.setId(rs.getInt("id"));
                 comment.setIssueId(rs.getInt("issue_id"));
                 comment.setUserId(rs.getInt("user_id"));
-                comment.setContent(rs.getString("content"));
+                comment.setContent(rs.getString("comment"));
                 comment.setCreatedAt(rs.getTimestamp("created_at"));
                 
                 comments.add(comment);
