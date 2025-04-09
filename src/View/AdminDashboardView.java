@@ -88,7 +88,7 @@ public class AdminDashboardView {
         });
     }
 
-    // Custom ButtonRenderer to render buttons in the JTable's Action column
+  
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
