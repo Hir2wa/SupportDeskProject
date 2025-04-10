@@ -585,11 +585,11 @@ buttonPanel.add(reportButton);
     
         if (comments != null && !comments.isEmpty()) {
             for (Comment comment : comments) {
-                // Get username for this comment
+            
                 User commentUser = userController.getUserById(comment.getUserId());
                 String commentUsername = commentUser != null ? commentUser.getUsername() : "Unknown User";
                 
-                // Create a panel for this comment
+            
                 JPanel commentPanel = createCommentPanel(comment, commentUsername);
                 commentsContainer.add(commentPanel);
                 commentsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
