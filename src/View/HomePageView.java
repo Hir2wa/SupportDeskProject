@@ -826,16 +826,15 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
             try {
                 boolean success = false;
         
-                // Handle reporting logic based on which ID (issue or comment) is provided
+             
                 if (issueId != null) {
-                    // Report an issue
-                    success = reportController.reportIssue(userId, issueId, fullReason); // Ensure the correct method is called for issue reporting
+                 
+                    success = reportController.reportIssue(userId, issueId, fullReason); 
                 } else if (commentId != null) {
-                    // Report a comment
-                    success = reportController.reportComment(userId, commentId, fullReason); // Corrected to handle comment reporting
+                  
+                    success = reportController.reportComment(userId, commentId, fullReason); 
                 }
         
-                // Handle success or failure of the report submission
                 if (success) {
                     JOptionPane.showMessageDialog(reportDialog, 
                         "Your report has been submitted successfully. Thank you for helping to keep our community safe.", 
