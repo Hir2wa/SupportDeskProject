@@ -315,9 +315,9 @@ public class HomePageView {
         long timeDiff = currentTime - timestamp.getTime();
         
    
-        if (timeDiff < 60000) { // Less than a minute
+        if (timeDiff < 60000) { 
             return "Just now";
-        } else if (timeDiff < 3600000) { // Less than an hour
+        } else if (timeDiff < 3600000) { 
             long minutes = timeDiff / 60000;
             return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
         } else if (timeDiff < 86400000) { // Less than a day
