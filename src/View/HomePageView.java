@@ -426,19 +426,18 @@ reportButton.setFont(new Font("Arial", Font.PLAIN, 12));
 likeButton.addActionListener(e -> {
     try {
         if (!liked[0]) {
-            // Try to like the issue
+           
             Like like = new Like(issueId, this.username);
             boolean success = issueController.likeIssue(like, userId);
             
             if (success) {
-                // Like was successful
+            
                 likeCount[0]++;
                 liked[0] = true;
                 likeButton.setText("Unlike 👍");
                 likeButton.setBackground(primaryColor);
                 likeButton.setForeground(Color.WHITE);
-                
-                // Handle dislike if necessary
+               
                 if (disliked[0]) {
                     dislikeCount[0]--;
                     disliked[0] = false;
