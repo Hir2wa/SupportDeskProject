@@ -263,7 +263,7 @@ public class HomePageView {
     
         postsPanel.removeAll();
         
-        // Get issues from controller
+ 
         List<Issue> issues = issueController.getAllIssues();
         
         if (issues.isEmpty()) {
@@ -275,7 +275,7 @@ public class HomePageView {
             postsPanel.add(noIssuesLabel);
             postsPanel.add(Box.createVerticalGlue());
         } else {
-            // For each issue, create a post panel
+         
             for (Issue issue : issues) {
                 // Get the actual username for each post based on user_id
                 String posterUsername;
