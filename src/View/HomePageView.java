@@ -393,13 +393,13 @@ likeLabel.setFont(new Font("Arial", Font.BOLD, 12));
 JLabel dislikeLabel = new JLabel(initialDislikeCount + " Dislikes");
 dislikeLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
-// Use array to track state changes
+
 final boolean[] liked = {hasLiked};
 final boolean[] disliked = {hasDisliked};
 final int[] likeCount = {initialLikeCount};
 final int[] dislikeCount = {initialDislikeCount};
 
-// Update button appearance based on initial state
+
 if (liked[0]) {
     likeButton.setText("Unlike 👍");
     likeButton.setBackground(primaryColor);
@@ -422,7 +422,7 @@ reportButton.setBackground(new Color(240, 240, 240));
 reportButton.setForeground(new Color(60, 60, 60));
 reportButton.setFont(new Font("Arial", Font.PLAIN, 12));
 
-// Like button action listener
+
 likeButton.addActionListener(e -> {
     try {
         if (!liked[0]) {
