@@ -697,51 +697,64 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         dialogPanel.add(detailsScroll);
         dialogPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         dialogPanel.add(buttonPanel);
-        
         cancelButton.addActionListener(e -> reportDialog.dispose());
-        submitButton.addActionListener(e -> {
-            String selectedReason = (String) reasonComboBox.getSelectedItem();
-            if (selectedReason.equals("Select a reason...")) {
-                JOptionPane.showMessageDialog(reportDialog, 
-                    "Please select a reason for your report.", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            String fullReason = selectedReason;
-            String additionalDetails = detailsArea.getText().trim();
-            
-            if (!additionalDetails.isEmpty()) {
-                fullReason += ": " + additionalDetails;
-            }
-            
-            Report report = new Report(userId, commentId, issueId, fullReason);
-            boolean success;
-            
-            if (issueId != null) {
-                // Fix the parameters (looks like you're passing userId twice)
-                success = reportController.reportComment(userId, commentId, fullReason);
-            } else {
-                // Use the createReport method which accepts a Report object
-                success = reportController.createReport(report);
-            }
-            
-            if (success) {
-                JOptionPane.showMessageDialog(reportDialog, 
-                    "Your report has been submitted successfully. Thank you for helping to keep our community safe.", 
-                    "Report Submitted", JOptionPane.INFORMATION_MESSAGE);
-                reportDialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(reportDialog, 
-                    "Failed to submit your report. Please try again.", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        
-        reportDialog.setContentPane(dialogPanel);
-        reportDialog.setVisible(true);
+submitButton.addActionListener(e -> {
+    String selectedReason = (String) reasonComboBox.getSelectedItem();
+    if (selectedReason == null || selectedReason.equals("Select a reason...")) {
+        JOptionPane.showMessageDialog(reportDialog, 
+            "Please select a reason for your report.", 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    String fullReason = selectedReason;
+    String additionalDetails = detailsArea.getText().trim();
+    
+    if (!additionalDetails.isEmpty()) {
+        fullReason += ": " + additionalDetails;
     }
     
-    // In your submitComment action listener, modify to use the new comment panel approach
+    // Ensure issueId or commentId is not null before proceeding
+    if (issueId == null && commentId == null) {
+        JOptionPane.showMessageDialog(reportDialog, 
+            "Invalid issue or comment ID.", 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    Report report = new Report(userId, commentId, issueId, fullReason);
+    try {
+        boolean success;
+        if (issueId != null) {
+            success = reportController.reportComment(userId, commentId, fullReason);
+        } else {
+            success = reportController.createReport(report);
+        }
+        
+        if (success) {
+            JOptionPane.showMessageDialog(reportDialog, 
+                "Your report has been submitted successfully. Thank you for helping to keep our community safe.", 
+                "Report Submitted", JOptionPane.INFORMATION_MESSAGE);
+            reportDialog.dispose();
+        } else {
+            JOptionPane.showMessageDialog(reportDialog, 
+                "Failed to submit your report. Please try again.", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace(); // Log for debugging purposes
+        JOptionPane.showMessageDialog(reportDialog, 
+            "An unexpected error occurred. Please try again.", 
+            "Error", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+reportDialog.setContentPane(dialogPanel);
+reportDialog.setVisible(true);
+
+       
+    }
+    
+   
    
 }

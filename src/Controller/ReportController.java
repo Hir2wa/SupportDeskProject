@@ -195,6 +195,64 @@ public class ReportController {
         return false;
     }
 
+
+    public List<Report> fetchReportsBy(Integer issueId, Integer commentId, Integer reportedBy) {
+        List<Report> reports = new ArrayList<>();
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM reports WHERE 1=1");
+
+        if (issueId != null) {
+            sqlBuilder.append(" AND issue_id = ?");
+        }
+        if (commentId != null) {
+            sqlBuilder.append(" AND comment_id = ?");
+        }
+        if (reportedBy != null) {
+            sqlBuilder.append(" AND reported_by = ?");
+        }
+
+        sqlBuilder.append(" ORDER BY created_at DESC");
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sqlBuilder.toString())) {
+            int index = 1;
+            if (issueId != null) {
+                pstmt.setInt(index++, issueId);
+            }
+            if (commentId != null) {
+                pstmt.setInt(index++, commentId);
+            }
+            if (reportedBy != null) {
+                pstmt.setInt(index++, reportedBy);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Report report = new Report();
+                    report.setId(rs.getInt("id"));
+                    report.setReportedBy(rs.getInt("reported_by"));
+
+                    int commentIdResult = rs.getInt("comment_id");
+                    if (!rs.wasNull()) {
+                        report.setCommentId(commentIdResult);
+                    }
+
+                    int issueIdResult = rs.getInt("issue_id");
+                    if (!rs.wasNull()) {
+                        report.setIssueId(issueIdResult);
+                    }
+
+                    report.setReason(rs.getString("reason"));
+                    report.setCreatedAt(rs.getTimestamp("created_at"));
+
+                    reports.add(report);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reports;
+    }
+
     public boolean hasUserReportedComment(int userId, int commentId) {
         String sql = "SELECT COUNT(*) AS count FROM reports WHERE reported_by = ? AND comment_id = ?";
 
