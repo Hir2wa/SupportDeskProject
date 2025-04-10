@@ -26,18 +26,19 @@ public class HomePageView {
     private String username;
     private IssueController issueController;
     private UserController userController;
+    private ReportController reportController;
     private int userId;
     private Color primaryColor = new Color(0, 102, 204);
     private Color accentColor = new Color(51, 153, 255);
     private Color lightGray = new Color(245, 245, 245);
-    private ReportController reportController;
 
     public HomePageView(String username, ImageIcon profilePic) {
         this.username = username;
+        this.reportController = new ReportController(); 
         this.issueController = new IssueController();
         this.userController = new UserController();
         this.userId = getUserIdFromUsername(username);
-        this.reportController = new ReportController();
+        
         // ==== Frame setup ====
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
