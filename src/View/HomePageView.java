@@ -287,7 +287,7 @@ public class HomePageView {
                     posterUsername = posterUser != null ? posterUser.getUsername() : "Unknown User #" + issue.getUserId();
                 }
                 
-                // Format the timestamp
+         
                 String timeDisplay = formatTimestamp(issue.getCreatedAt());
                 
                 JPanel postPanel = createPostPanel(issue.getDescription(), posterUsername, timeDisplay, issue.getId());
@@ -310,11 +310,11 @@ public class HomePageView {
             return "Unknown time";
         }
         
-        // Get current time
+      
         long currentTime = System.currentTimeMillis();
         long timeDiff = currentTime - timestamp.getTime();
         
-        // Format based on how long ago
+   
         if (timeDiff < 60000) { // Less than a minute
             return "Just now";
         } else if (timeDiff < 3600000) { // Less than an hour
