@@ -344,7 +344,7 @@ public class HomePageView {
         postPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
         postPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ==== Post Content ====
+  
         JTextArea postContent = new JTextArea(postText);
         postContent.setFont(new Font("Arial", Font.PLAIN, 14));
         postContent.setLineWrap(true);
@@ -353,7 +353,7 @@ public class HomePageView {
         postContent.setBackground(Color.WHITE);
         postContent.setBorder(BorderFactory.createEmptyBorder());
 
-        // ==== Info ====
+      
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         infoPanel.setBackground(lightGray);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 8, 5, 8));
@@ -369,7 +369,7 @@ public class HomePageView {
         infoPanel.add(postInfo);
         infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-      // ==== Like/Dislike Buttons and Logic ====
+   
 JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 buttonPanel.setBackground(Color.WHITE);
 buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -378,15 +378,15 @@ JButton likeButton = createStyledButton("Like 👍", primaryColor);
 JButton dislikeButton = createStyledButton("Dislike 👎", new Color(150, 150, 150));
 JButton reportButton = createStyledButton("Report ⚠️", new Color(220, 53, 69));
 
-// Get initial counts from database
+
 int initialLikeCount = issueController.getLikeCount(issueId);
 int initialDislikeCount = issueController.getDislikeCount(issueId);
 
-// Check if current user has already liked/disliked this issue
+
 boolean hasLiked = issueController.hasUserLikedIssue(userId, issueId);
 boolean hasDisliked = issueController.hasUserDislikedIssue(userId, issueId);
 
-// Create labels for counts
+
 JLabel likeLabel = new JLabel(initialLikeCount + " Likes");
 likeLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
