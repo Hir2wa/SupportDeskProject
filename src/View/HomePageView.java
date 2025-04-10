@@ -208,7 +208,7 @@ public class HomePageView {
                 
                         loadIssues();
                         
-                        // Clear the text area after posting
+                        
                         newPostTextArea.setText("");
                         JOptionPane.showMessageDialog(homeFrame, "Issue posted successfully!");
                     } else {
@@ -220,7 +220,7 @@ public class HomePageView {
             }
         });
         
-        // Load existing issues on startup
+  
         loadIssues();
     }
     
