@@ -600,7 +600,7 @@ buttonPanel.add(reportButton);
         commentScroll.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 1));
         commentScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Comment input section
+     
         JPanel commentInputPanel = new JPanel();
         commentInputPanel.setLayout(new BoxLayout(commentInputPanel, BoxLayout.X_AXIS));
         commentInputPanel.setBackground(Color.WHITE);
@@ -614,7 +614,7 @@ buttonPanel.add(reportButton);
         JButton submitComment = createStyledButton("Post", accentColor);
         submitComment.setFont(new Font("Arial", Font.BOLD, 12));
 
-    // Delete this entire block at the end of your file
+ 
 submitComment.addActionListener(e -> extracted(username, issueId, commentSectionPanel, commentInput));
 
         commentInputPanel.add(commentInput);
@@ -627,7 +627,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         commentSectionPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         commentSectionPanel.add(commentInputPanel);
 
-        // ==== Add Components to Post Panel ====
+    
         postPanel.add(infoPanel);
         postPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         postPanel.add(postContent);
@@ -642,7 +642,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
     private void extracted(String username, int issueId, JPanel commentSectionPanel, JTextField commentInput) {
         String commentText = commentInput.getText().trim();
         if (!commentText.isEmpty()) {
-            // Create Comment object
+      
             Comment comment = new Comment();
             comment.setIssueId(issueId);
             comment.setContent(commentText);
