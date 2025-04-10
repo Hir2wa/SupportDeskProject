@@ -654,7 +654,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
              
                 JPanel commentPanel = createCommentPanel(comment, username);
                 
-                // Make sure commentSectionPanel exists and has the right components
+            
                 if (commentSectionPanel != null && commentSectionPanel.getComponentCount() >= 3) {
                     JScrollPane commentScroll = (JScrollPane) commentSectionPanel.getComponent(2);
                     JPanel commentsContainer = (JPanel) commentScroll.getViewport().getView();
@@ -664,7 +664,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                     commentsContainer.repaint();
                 }
                 
-                // Clear the input field
+             
                 commentInput.setText("");
             } else {
                 JOptionPane.showMessageDialog(homeFrame, 
@@ -674,7 +674,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         }
     }
     
-    // New method to create a panel for a single comment with a report button
+
     private JPanel createCommentPanel(Comment comment, String username) {
         JPanel commentPanel = new JPanel();
         commentPanel.setLayout(new BorderLayout());
