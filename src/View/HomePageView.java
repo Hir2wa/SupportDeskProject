@@ -117,7 +117,7 @@ public class HomePageView {
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel for new post input with title
+    
         JPanel newPostPanel = new JPanel();
         newPostPanel.setLayout(new BoxLayout(newPostPanel, BoxLayout.Y_AXIS));
         newPostPanel.setBorder(new CompoundBorder(
@@ -130,7 +130,7 @@ public class HomePageView {
         newPostPanel.setBackground(Color.WHITE);
         newPostPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
         
-        // Text area for new post input
+       
         JTextArea newPostTextArea = new JTextArea(4, 50);
         newPostTextArea.setWrapStyleWord(true);
         newPostTextArea.setLineWrap(true);
@@ -144,7 +144,7 @@ public class HomePageView {
         postScrollPane.setBorder(BorderFactory.createEmptyBorder());
         postScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Post Button
+   
         JButton postButton = createStyledButton("Post New Issue", accentColor);
         postButton.setFont(new Font("Arial", Font.BOLD, 14));
         postButton.setForeground(Color.WHITE);
