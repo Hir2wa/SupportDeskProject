@@ -320,10 +320,10 @@ public class HomePageView {
         } else if (timeDiff < 3600000) { 
             long minutes = timeDiff / 60000;
             return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
-        } else if (timeDiff < 86400000) { // Less than a day
+        } else if (timeDiff < 86400000) { 
             long hours = timeDiff / 3600000;
             return hours + (hours == 1 ? " hour ago" : " hours ago");
-        } else if (timeDiff < 604800000) { // Less than a week
+        } else if (timeDiff < 604800000) { 
             long days = timeDiff / 86400000;
             return days + (days == 1 ? " day ago" : " days ago");
         } else {
