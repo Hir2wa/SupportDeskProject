@@ -527,7 +527,7 @@ dislikeButton.addActionListener(e -> {
             }
         }
         
-        // Update dislike count label
+
         dislikeLabel.setText(dislikeCount[0] + " Dislikes");
     } catch (Exception ex) {
         ex.printStackTrace();
@@ -537,9 +537,9 @@ dislikeButton.addActionListener(e -> {
     }
 });
 
-// Report button action listener
+
 reportButton.addActionListener(e -> {
-    // Check if user has already reported this issue
+
     if (reportController.hasUserReportedIssue(userId, issueId)) {
         JOptionPane.showMessageDialog(homeFrame, 
             "You have already reported this issue.", 
@@ -547,7 +547,7 @@ reportButton.addActionListener(e -> {
         return;
     }
     
-    // Show report dialog
+
     showReportDialog(issueId, null);
 });
 
