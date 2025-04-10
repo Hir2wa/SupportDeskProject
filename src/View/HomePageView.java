@@ -190,15 +190,14 @@ public class HomePageView {
         homeFrame.setContentPane(mainPanel);
         homeFrame.setVisible(true);
 
-        // Add action listener to post button
         postButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String postText = newPostTextArea.getText().trim();
                 if (!postText.isEmpty()) {
-                    // Create Issue object
+                 
                     Issue newIssue = new Issue();
-                    newIssue.setTitle("New Issue by " + username); // Default title
+                    newIssue.setTitle("New Issue by " + username); 
                     newIssue.setDescription(postText);
                     newIssue.setUserId(userId);
                     
