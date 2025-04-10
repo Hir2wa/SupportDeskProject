@@ -277,12 +277,12 @@ public class HomePageView {
         } else {
          
             for (Issue issue : issues) {
-                // Get the actual username for each post based on user_id
+         
                 String posterUsername;
                 if (issue.getUserId() == userId) {
-                    posterUsername = username; // Current user's post
+                    posterUsername = username;
                 } else {
-                    // Fetch the username from the database based on the user_id
+               
                     User posterUser = userController.getUserById(issue.getUserId());
                     posterUsername = posterUser != null ? posterUser.getUsername() : "Unknown User #" + issue.getUserId();
                 }
