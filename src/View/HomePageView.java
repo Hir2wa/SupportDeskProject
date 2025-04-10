@@ -647,14 +647,11 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
             comment.setIssueId(issueId);
             comment.setContent(commentText);
             
-            // Save to database with the actual userId
+        
             boolean commentAdded = issueController.addComment(comment, userId);
             
             if (commentAdded) {
-                // Get the ID of the newly added comment
-                int commentId = comment.getId(); // Make sure your addComment method sets the ID
-                
-                // Create a new comment panel and add it to the comments container
+             
                 JPanel commentPanel = createCommentPanel(comment, username);
                 
                 // Make sure commentSectionPanel exists and has the right components
