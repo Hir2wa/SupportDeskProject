@@ -4,12 +4,14 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import Controller.ReportController;
+
 import Controller.IssueController;
+import Controller.ReportController;
 import Controller.UserController;
 import model.Issue;
 import model.Like;
 import model.Comment;
+import model.Report;
 import model.User;
 
 import java.awt.*;
@@ -34,9 +36,9 @@ public class HomePageView {
 
     public HomePageView(String username, ImageIcon profilePic) {
         this.username = username;
-        this.reportController = new ReportController(); 
         this.issueController = new IssueController();
         this.userController = new UserController();
+        this.reportController = new ReportController();
         this.userId = getUserIdFromUsername(username);
         
         // ==== Frame setup ====
@@ -337,6 +339,7 @@ public class HomePageView {
         
         JButton likeButton = createStyledButton("Like 👍", primaryColor);
         JButton dislikeButton = createStyledButton("Dislike 👎", new Color(150, 150, 150));
+        JButton reportButton = createStyledButton("Report ⚠️", new Color(220, 53, 69));
 
         // Get initial like count from database
         int initialLikeCount = issueController.getLikeCount(issueId);
@@ -363,6 +366,10 @@ public class HomePageView {
 
         dislikeButton.setBackground(new Color(240, 240, 240));
         dislikeButton.setForeground(new Color(60, 60, 60));
+        
+        reportButton.setBackground(new Color(240, 240, 240));
+        reportButton.setForeground(new Color(60, 60, 60));
+        reportButton.setFont(new Font("Arial", Font.PLAIN, 12));
 
         likeButton.addActionListener(e -> {
             try {
@@ -426,12 +433,27 @@ public class HomePageView {
                 "Dislike functionality not implemented yet.", 
                 "Notice", JOptionPane.INFORMATION_MESSAGE);
         });
+        
+        reportButton.addActionListener(e -> {
+            // Check if user has already reported this issue
+            if (reportController.hasUserReportedIssue(userId, issueId)) {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "You have already reported this issue.", 
+                    "Notice", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            // Show report dialog
+            showReportDialog(issueId, null);
+        });
 
         buttonPanel.add(likeButton);
         buttonPanel.add(likeLabel);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPanel.add(dislikeButton);
         buttonPanel.add(dislikeLabel);
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonPanel.add(reportButton);
 
         // ==== Comment Section ====
         JPanel commentSectionPanel = new JPanel();
@@ -450,26 +472,27 @@ public class HomePageView {
         // Load existing comments for this issue
         List<Comment> comments = issueController.getCommentsForIssue(issueId);
         
-        JTextArea commentsArea = new JTextArea(3, 60);
-        commentsArea.setEditable(false);
-        commentsArea.setLineWrap(true);
-        commentsArea.setWrapStyleWord(true);
-        commentsArea.setFont(new Font("Arial", Font.PLAIN, 13));
-        commentsArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        commentsArea.setBackground(lightGray);
+        // Create a panel to hold all comments
+        JPanel commentsContainer = new JPanel();
+        commentsContainer.setLayout(new BoxLayout(commentsContainer, BoxLayout.Y_AXIS));
+        commentsContainer.setBackground(Color.WHITE);
+        commentsContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        // Add existing comments to the text area
+        // Add existing comments to the container
         if (comments != null && !comments.isEmpty()) {
             for (Comment comment : comments) {
                 // Get username for this comment
                 User commentUser = userController.getUserById(comment.getUserId());
                 String commentUsername = commentUser != null ? commentUser.getUsername() : "Unknown User";
                 
-                commentsArea.append(commentUsername + ": " + comment.getContent() + "\n\n");
+                // Create a panel for this comment
+                JPanel commentPanel = createCommentPanel(comment, commentUsername);
+                commentsContainer.add(commentPanel);
+                commentsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
             }
         }
         
-        JScrollPane commentScroll = new JScrollPane(commentsArea);
+        JScrollPane commentScroll = new JScrollPane(commentsContainer);
         commentScroll.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 1));
         commentScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -499,7 +522,18 @@ public class HomePageView {
                 boolean commentAdded = issueController.addComment(comment, userId);
                 
                 if (commentAdded) {
-                    commentsArea.append(this.username + ": " + commentText + "\n\n");
+                    // Create a panel for the new comment
+                    JPanel commentPanel = createCommentPanel(comment, this.username);
+                    
+                    // Add to the comments container
+                    JScrollPane commentScrollPane = (JScrollPane) commentSectionPanel.getComponent(2);
+                    JPanel commentsContainerPanel = (JPanel) commentScrollPane.getViewport().getView();
+                    commentsContainerPanel.add(commentPanel);
+                    commentsContainerPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                    commentsContainerPanel.revalidate();
+                    commentsContainerPanel.repaint();
+                    
+                    // Clear the input field
                     commentInput.setText("");
                 } else {
                     JOptionPane.showMessageDialog(homeFrame, 
@@ -530,4 +564,205 @@ public class HomePageView {
 
         return postPanel;
     }
+    
+    // New method to create a panel for a single comment with a report button
+    private JPanel createCommentPanel(Comment comment, String username) {
+        JPanel commentPanel = new JPanel();
+        commentPanel.setLayout(new BorderLayout());
+        commentPanel.setBackground(lightGray);
+        commentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(lightGray);
+        
+        JLabel usernameLabel = new JLabel(username + ": ");
+        usernameLabel.setFont(new Font("Arial", Font.BOLD, 13));
+        
+        JTextArea commentContent = new JTextArea(comment.getContent());
+        commentContent.setEditable(false);
+        commentContent.setLineWrap(true);
+        commentContent.setWrapStyleWord(true);
+        commentContent.setFont(new Font("Arial", Font.PLAIN, 13));
+        commentContent.setBackground(lightGray);
+        commentContent.setBorder(BorderFactory.createEmptyBorder());
+        
+        contentPanel.add(usernameLabel, BorderLayout.WEST);
+        contentPanel.add(commentContent, BorderLayout.CENTER);
+        
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actionPanel.setBackground(lightGray);
+        
+        JButton reportCommentButton = new JButton("⚠️");
+        reportCommentButton.setBorderPainted(false);
+        reportCommentButton.setFocusPainted(false);
+        reportCommentButton.setContentAreaFilled(false);
+        reportCommentButton.setToolTipText("Report Comment");
+        reportCommentButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        reportCommentButton.addActionListener(e -> {
+            // Check if the user has already reported this comment
+            if (reportController.hasUserReportedComment(userId, comment.getId())) {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "You have already reported this comment.", 
+                    "Notice", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            // Show report dialog
+            showReportDialog(null, comment.getId());
+        });
+        
+        actionPanel.add(reportCommentButton);
+        
+        commentPanel.add(contentPanel, BorderLayout.CENTER);
+        commentPanel.add(actionPanel, BorderLayout.EAST);
+        
+        return commentPanel;
+    }
+    
+    // Method to display the report dialog
+    private void showReportDialog(Integer issueId, Integer commentId) {
+        JDialog reportDialog = new JDialog(homeFrame, "Report", true);
+        reportDialog.setSize(400, 300);
+        reportDialog.setLocationRelativeTo(homeFrame);
+        
+        JPanel dialogPanel = new JPanel();
+        dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+        dialogPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        
+        JLabel titleLabel = new JLabel("Report " + (issueId != null ? "Issue" : "Comment"));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel instructionLabel = new JLabel("Please provide a reason for your report:");
+        instructionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        instructionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        String[] reportReasons = {
+            "Select a reason...",
+            "Inappropriate content",
+            "Spam",
+            "Harassment",
+            "Misinformation",
+            "Other"
+        };
+        
+        JComboBox<String> reasonComboBox = new JComboBox<>(reportReasons);
+        reasonComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        reasonComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JTextArea detailsArea = new JTextArea(5, 20);
+        detailsArea.setLineWrap(true);
+        detailsArea.setWrapStyleWord(true);
+        detailsArea.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(8, 8, 8, 8)
+        ));
+        
+        JScrollPane detailsScroll = new JScrollPane(detailsArea);
+        detailsScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel detailsLabel = new JLabel("Additional details (optional):");
+        detailsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        detailsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton cancelButton = new JButton("Cancel");
+        JButton submitButton = new JButton("Submit Report");
+        submitButton.setBackground(primaryColor);
+        submitButton.setForeground(Color.WHITE);
+        
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(submitButton);
+        
+        dialogPanel.add(titleLabel);
+        dialogPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        dialogPanel.add(instructionLabel);
+        dialogPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        dialogPanel.add(reasonComboBox);
+        dialogPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        dialogPanel.add(detailsLabel);
+        dialogPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        dialogPanel.add(detailsScroll);
+        dialogPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        dialogPanel.add(buttonPanel);
+        
+        cancelButton.addActionListener(e -> reportDialog.dispose());
+        submitButton.addActionListener(e -> {
+            String selectedReason = (String) reasonComboBox.getSelectedItem();
+            if (selectedReason.equals("Select a reason...")) {
+                JOptionPane.showMessageDialog(reportDialog, 
+                    "Please select a reason for your report.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            String fullReason = selectedReason;
+            String additionalDetails = detailsArea.getText().trim();
+            
+            if (!additionalDetails.isEmpty()) {
+                fullReason += ": " + additionalDetails;
+            }
+            
+            Report report = new Report(userId, commentId, issueId, fullReason);
+            boolean success;
+            
+            if (issueId != null) {
+                // Fix the parameters (looks like you're passing userId twice)
+                success = reportController.reportComment(userId, commentId, fullReason);
+            } else {
+                // Use the createReport method which accepts a Report object
+                success = reportController.createReport(report);
+            }
+            
+            if (success) {
+                JOptionPane.showMessageDialog(reportDialog, 
+                    "Your report has been submitted successfully. Thank you for helping to keep our community safe.", 
+                    "Report Submitted", JOptionPane.INFORMATION_MESSAGE);
+                reportDialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(reportDialog, 
+                    "Failed to submit your report. Please try again.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        reportDialog.setContentPane(dialogPanel);
+        reportDialog.setVisible(true);
+    }
+    
+    // In your submitComment action listener, modify to use the new comment panel approach
+    submitComment.addActionListener(e -> {
+        String commentText = commentInput.getText().trim();
+        if (!commentText.isEmpty()) {
+            // Create Comment object
+            Comment comment = new Comment();
+            comment.setIssueId(issueId);
+            comment.setContent(commentText);
+            
+            // Save to database with the actual userId
+            boolean commentAdded = issueController.addComment(comment, userId);
+            
+            if (commentAdded) {
+                // Get the ID of the newly added comment
+                int commentId = comment.getId(); // Assuming your addComment method sets the ID
+                
+                // Create a new comment panel and add it to the comments container
+                JPanel commentPanel = createCommentPanel(comment, username);
+                JScrollPane commentScroll = (JScrollPane) commentSectionPanel.getComponent(2);
+                JPanel commentsContainer = (JPanel) commentScroll.getViewport().getView();
+                commentsContainer.add(commentPanel);
+                commentsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
+                commentsContainer.revalidate();
+                commentsContainer.repaint();
+                
+                // Clear the input field
+                commentInput.setText("");
+            } else {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "Failed to post comment. Please try again.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    });
 }
