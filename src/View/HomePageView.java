@@ -29,6 +29,9 @@ public class HomePageView {
     private IssueController issueController;
     private UserController userController;
     private ReportController reportController;
+    private JTextField commentInput;
+    private Integer issueId;
+    private JPanel commentSectionPanel;
     private int userId;
     private Color primaryColor = new Color(0, 102, 204);
     private Color accentColor = new Color(51, 153, 255);
@@ -510,38 +513,8 @@ public class HomePageView {
         JButton submitComment = createStyledButton("Post", accentColor);
         submitComment.setFont(new Font("Arial", Font.BOLD, 12));
 
-        submitComment.addActionListener(e -> {
-            String commentText = commentInput.getText().trim();
-            if (!commentText.isEmpty()) {
-                // Create Comment object
-                Comment comment = new Comment();
-                comment.setIssueId(issueId);
-                comment.setContent(commentText);
-                
-                // Save to database with the actual userId
-                boolean commentAdded = issueController.addComment(comment, userId);
-                
-                if (commentAdded) {
-                    // Create a panel for the new comment
-                    JPanel commentPanel = createCommentPanel(comment, this.username);
-                    
-                    // Add to the comments container
-                    JScrollPane commentScrollPane = (JScrollPane) commentSectionPanel.getComponent(2);
-                    JPanel commentsContainerPanel = (JPanel) commentScrollPane.getViewport().getView();
-                    commentsContainerPanel.add(commentPanel);
-                    commentsContainerPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                    commentsContainerPanel.revalidate();
-                    commentsContainerPanel.repaint();
-                    
-                    // Clear the input field
-                    commentInput.setText("");
-                } else {
-                    JOptionPane.showMessageDialog(homeFrame, 
-                        "Failed to post comment. Please try again.", 
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
+    // Delete this entire block at the end of your file
+submitComment.addActionListener(e -> extracted(username, issueId, commentSectionPanel, commentInput));
 
         commentInputPanel.add(commentInput);
         commentInputPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -563,6 +536,44 @@ public class HomePageView {
         postPanel.add(commentSectionPanel);
 
         return postPanel;
+    }
+
+    private void extracted(String username, int issueId, JPanel commentSectionPanel, JTextField commentInput) {
+        String commentText = commentInput.getText().trim();
+        if (!commentText.isEmpty()) {
+            // Create Comment object
+            Comment comment = new Comment();
+            comment.setIssueId(issueId);
+            comment.setContent(commentText);
+            
+            // Save to database with the actual userId
+            boolean commentAdded = issueController.addComment(comment, userId);
+            
+            if (commentAdded) {
+                // Get the ID of the newly added comment
+                int commentId = comment.getId(); // Make sure your addComment method sets the ID
+                
+                // Create a new comment panel and add it to the comments container
+                JPanel commentPanel = createCommentPanel(comment, username);
+                
+                // Make sure commentSectionPanel exists and has the right components
+                if (commentSectionPanel != null && commentSectionPanel.getComponentCount() >= 3) {
+                    JScrollPane commentScroll = (JScrollPane) commentSectionPanel.getComponent(2);
+                    JPanel commentsContainer = (JPanel) commentScroll.getViewport().getView();
+                    commentsContainer.add(commentPanel);
+                    commentsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
+                    commentsContainer.revalidate();
+                    commentsContainer.repaint();
+                }
+                
+                // Clear the input field
+                commentInput.setText("");
+            } else {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "Failed to post comment. Please try again.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
     
     // New method to create a panel for a single comment with a report button
@@ -732,37 +743,5 @@ public class HomePageView {
     }
     
     // In your submitComment action listener, modify to use the new comment panel approach
-    submitComment.addActionListener(e -> {
-        String commentText = commentInput.getText().trim();
-        if (!commentText.isEmpty()) {
-            // Create Comment object
-            Comment comment = new Comment();
-            comment.setIssueId(issueId);
-            comment.setContent(commentText);
-            
-            // Save to database with the actual userId
-            boolean commentAdded = issueController.addComment(comment, userId);
-            
-            if (commentAdded) {
-                // Get the ID of the newly added comment
-                int commentId = comment.getId(); // Assuming your addComment method sets the ID
-                
-                // Create a new comment panel and add it to the comments container
-                JPanel commentPanel = createCommentPanel(comment, username);
-                JScrollPane commentScroll = (JScrollPane) commentSectionPanel.getComponent(2);
-                JPanel commentsContainer = (JPanel) commentScroll.getViewport().getView();
-                commentsContainer.add(commentPanel);
-                commentsContainer.add(Box.createRigidArea(new Dimension(0, 5)));
-                commentsContainer.revalidate();
-                commentsContainer.repaint();
-                
-                // Clear the input field
-                commentInput.setText("");
-            } else {
-                JOptionPane.showMessageDialog(homeFrame, 
-                    "Failed to post comment. Please try again.", 
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    });
+   
 }

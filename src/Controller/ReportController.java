@@ -53,19 +53,18 @@ public class ReportController {
         }
     }
     
-    // Report an issue
+
     public boolean reportIssue(int reportedBy, int issueId, String reason) {
         Report report = new Report(reportedBy, null, issueId, reason);
         return createReport(report);
     }
     
-    // Report a comment
+
     public boolean reportComment(int reportedBy, int commentId, String reason) {
         Report report = new Report(reportedBy, commentId, null, reason);
         return createReport(report);
     }
-    
-    // Get all reports
+
     public List<Report> getAllReports() {
         List<Report> reports = new ArrayList<>();
         String sql = "SELECT * FROM reports ORDER BY created_at DESC";
@@ -102,13 +101,12 @@ public class ReportController {
     }
     
     
-    // Get reports by issue ID
+
     public List<Report> getReportsByIssueId(int issueId) {
         List<Report> reports = new ArrayList<>();
         String sql = "SELECT * FROM reports WHERE issue_id = ? ORDER BY created_at DESC";
         
-     //   try (Connection conn = DBConnection.getConnection();
-         //    PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
             try (PreparedStatement pstmt= connection.prepareStatement(sql)){
             pstmt.setInt(1, issueId);
             
