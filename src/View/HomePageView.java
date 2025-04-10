@@ -815,16 +815,13 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                 fullReason += ": " + additionalDetails;
             }
             
-            // Ensure that either issueId or commentId is provided
+
             if (issueId == null && commentId == null) {
                 JOptionPane.showMessageDialog(reportDialog, 
                     "Invalid issue or comment ID.", 
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
-            // Create a report object
-            Report report = new Report(userId, commentId, issueId, fullReason);
             
             try {
                 boolean success = false;
