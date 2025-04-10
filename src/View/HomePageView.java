@@ -469,7 +469,7 @@ likeButton.addActionListener(e -> {
             }
         }
         
-        // Update like count label
+
         likeLabel.setText(likeCount[0] + " Likes");
     } catch (Exception ex) {
         ex.printStackTrace();
@@ -479,16 +479,16 @@ likeButton.addActionListener(e -> {
     }
 });
 
-// Dislike button action listener
+
 dislikeButton.addActionListener(e -> {
     try {
         if (!disliked[0]) {
-            // Try to dislike the issue
+        
             Like like = new Like(issueId, this.username);
             boolean success = issueController.dislikeIssue(like, userId);
             
             if (success) {
-                // Dislike was successful
+             
                 dislikeCount[0]++;
                 disliked[0] = true;
                 dislikeButton.setText("Undislike 👎");
