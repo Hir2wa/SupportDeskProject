@@ -105,87 +105,193 @@ public class IssueController {
      * @param issueId The issue ID
      * @return true if the user has already liked the issue, false otherwise
      */
-    public boolean hasUserLikedIssue(int userId, int issueId) {
-        String query = "SELECT COUNT(*) FROM likes WHERE user_id = ? AND issue_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, issueId);
-            
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    
+
+
+// Add these methods to your IssueController class
+
+/**
+ * Check if a user has already disliked an issue
+ * @param userId The user ID
+ * @param issueId The issue ID
+ * @return true if the user has already disliked the issue, false otherwise
+ */
+public boolean hasUserDislikedIssue(int userId, int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE user_id = ? AND issue_id = ? AND reaction_type = 'dislike'";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+/**
+ * Get the number of dislikes for an issue
+ * @param issueId The issue ID
+ * @return The number of dislikes
+ */
+public int getDislikeCount(int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE issue_id = ? AND reaction_type = 'dislike'";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+/**
+ * Add a dislike to an issue if not already disliked
+ * @param like The like object (used for issue_id)
+ * @param userId The user ID
+ * @return true if the dislike was added, false if already disliked or on error
+ */
+public boolean dislikeIssue(Like like, int userId) {
+    // Check if already disliked
+    if (hasUserDislikedIssue(userId, like.getIssueId())) {
+        return false; // Already disliked
+    }
+    
+    // First, remove any like from the user for this issue (if exists)
+    String deleteQuery = "DELETE FROM likes WHERE user_id = ? AND issue_id = ?";
+    try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+        deleteStmt.setInt(1, userId);
+        deleteStmt.setInt(2, like.getIssueId());
+        deleteStmt.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    // Add the dislike
+    String query = "INSERT INTO likes (user_id, issue_id, reaction_type) VALUES (?, ?, 'dislike')";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, like.getIssueId());
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
         return false;
     }
+}
 
-    /**
-     * Get the number of likes for an issue
-     * @param issueId The issue ID
-     * @return The number of likes
-     */
-    public int getLikeCount(int issueId) {
-        String query = "SELECT COUNT(*) FROM likes WHERE issue_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, issueId);
-            
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /**
-     * Add a like to an issue if not already liked
-     * @param like The like object
-     * @param userId The user ID
-     * @return true if the like was added, false if already liked or on error
-     */
-    public boolean likeIssue(Like like, int userId) {
-        // Check if already liked
-        if (hasUserLikedIssue(userId, like.getIssueId())) {
-            return false; // Already liked
-        }
+/**
+ * Remove a dislike from an issue
+ * @param userId The user ID
+ * @param issueId The issue ID
+ * @return true if the dislike was removed, false otherwise
+ */
+public boolean undislikeIssue(int userId, int issueId) {
+    String query = "DELETE FROM likes WHERE user_id = ? AND issue_id = ? AND reaction_type = 'dislike'";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, issueId);
         
-        // Add the like
-        String query = "INSERT INTO likes (user_id, issue_id) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, like.getIssueId());
-            
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
-    /**
-     * Remove a like from an issue
-     * @param userId The user ID
-     * @param issueId The issue ID
-     * @return true if the like was removed, false otherwise
-     */
-    public boolean unlikeIssue(int userId, int issueId) {
-        String query = "DELETE FROM likes WHERE user_id = ? AND issue_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, issueId);
-            
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+// Update the existing likeIssue method to specify reaction_type
+public boolean likeIssue(Like like, int userId) {
+    // Check if already liked
+    if (hasUserLikedIssue(userId, like.getIssueId())) {
+        return false; // Already liked
     }
+    
+    // First, remove any dislike from the user for this issue (if exists)
+    String deleteQuery = "DELETE FROM likes WHERE user_id = ? AND issue_id = ?";
+    try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+        deleteStmt.setInt(1, userId);
+        deleteStmt.setInt(2, like.getIssueId());
+        deleteStmt.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    // Add the like
+    String query = "INSERT INTO likes (user_id, issue_id, reaction_type) VALUES (?, ?, 'like')";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, like.getIssueId());
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+// Update hasUserLikedIssue to check for the specific reaction type
+public boolean hasUserLikedIssue(int userId, int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE user_id = ? AND issue_id = ? AND reaction_type = 'like'";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, userId);
+        stmt.setInt(2, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+// Update getLikeCount to check for the specific reaction type
+public int getLikeCount(int issueId) {
+    String query = "SELECT COUNT(*) FROM likes WHERE issue_id = ? AND reaction_type = 'like'";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setInt(1, issueId);
+        
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Comment on an issue (updated to include user_id)
     public boolean addComment(Comment comment, int userId) {

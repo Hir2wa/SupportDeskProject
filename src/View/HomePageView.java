@@ -335,128 +335,197 @@ public class HomePageView {
         infoPanel.add(postInfo);
         infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        // ==== Like/Dislike Buttons and Logic ====
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        JButton likeButton = createStyledButton("Like 👍", primaryColor);
-        JButton dislikeButton = createStyledButton("Dislike 👎", new Color(150, 150, 150));
-        JButton reportButton = createStyledButton("Report ⚠️", new Color(220, 53, 69));
+      // ==== Like/Dislike Buttons and Logic ====
+JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+buttonPanel.setBackground(Color.WHITE);
+buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Get initial like count from database
-        int initialLikeCount = issueController.getLikeCount(issueId);
-        JLabel likeLabel = new JLabel(initialLikeCount + " Likes");
-        likeLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        
-        JLabel dislikeLabel = new JLabel("0 Dislikes");
-        dislikeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+JButton likeButton = createStyledButton("Like 👍", primaryColor);
+JButton dislikeButton = createStyledButton("Dislike 👎", new Color(150, 150, 150));
+JButton reportButton = createStyledButton("Report ⚠️", new Color(220, 53, 69));
 
-        // Check if current user has already liked this issue
-        boolean hasLiked = issueController.hasUserLikedIssue(userId, issueId);
-        final boolean[] liked = {hasLiked};
-        final boolean[] disliked = {false};
-        final int[] likeCount = {initialLikeCount};
-        final int[] dislikeCount = {0};
-        
-        // Update button appearance based on like status
-        if (liked[0]) {
-            likeButton.setText("Unlike 👍");
-        } else {
-            likeButton.setBackground(new Color(240, 240, 240));
-            likeButton.setForeground(new Color(60, 60, 60));
-        }
+// Get initial counts from database
+int initialLikeCount = issueController.getLikeCount(issueId);
+int initialDislikeCount = issueController.getDislikeCount(issueId);
 
-        dislikeButton.setBackground(new Color(240, 240, 240));
-        dislikeButton.setForeground(new Color(60, 60, 60));
-        
-        reportButton.setBackground(new Color(240, 240, 240));
-        reportButton.setForeground(new Color(60, 60, 60));
-        reportButton.setFont(new Font("Arial", Font.PLAIN, 12));
+// Check if current user has already liked/disliked this issue
+boolean hasLiked = issueController.hasUserLikedIssue(userId, issueId);
+boolean hasDisliked = issueController.hasUserDislikedIssue(userId, issueId);
 
-        likeButton.addActionListener(e -> {
-            try {
-                if (!liked[0]) {
-                    // Try to like the issue
-                    Like like = new Like(issueId, this.username);
-                    boolean success = issueController.likeIssue(like, userId);
-                    
-                    if (success) {
-                        // Like was successful
-                        likeCount[0]++;
-                        liked[0] = true;
-                        likeButton.setText("Unlike 👍");
-                        likeButton.setBackground(primaryColor);
-                        likeButton.setForeground(Color.WHITE);
-                        
-                        // Handle dislike if necessary
-                        if (disliked[0]) {
-                            dislikeCount[0]--;
-                            disliked[0] = false;
-                            dislikeButton.setText("Dislike 👎");
-                            dislikeButton.setBackground(new Color(240, 240, 240));
-                            dislikeButton.setForeground(new Color(60, 60, 60));
-                        }
-                    } else {
-                        // Already liked (shouldn't happen with our initial check, but just in case)
-                        JOptionPane.showMessageDialog(homeFrame, 
-                            "You've already liked this issue.", 
-                            "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    // Unlike the issue
-                    boolean success = issueController.unlikeIssue(userId, issueId);
-                    
-                    if (success) {
-                        likeCount[0]--;
-                        liked[0] = false;
-                        likeButton.setText("Like 👍");
-                        likeButton.setBackground(new Color(240, 240, 240));
-                        likeButton.setForeground(new Color(60, 60, 60));
-                    } else {
-                        JOptionPane.showMessageDialog(homeFrame, 
-                            "Failed to unlike the issue. Please try again.", 
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                
-                // Update like count label
-                likeLabel.setText(likeCount[0] + " Likes");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(homeFrame, 
-                    "Error: " + ex.getMessage(), 
-                    "Like Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+// Create labels for counts
+JLabel likeLabel = new JLabel(initialLikeCount + " Likes");
+likeLabel.setFont(new Font("Arial", Font.BOLD, 12));
 
-        dislikeButton.addActionListener(e -> {
-            // Placeholder for dislike functionality
-            JOptionPane.showMessageDialog(homeFrame, 
-                "Dislike functionality not implemented yet.", 
-                "Notice", JOptionPane.INFORMATION_MESSAGE);
-        });
-        
-        reportButton.addActionListener(e -> {
-            // Check if user has already reported this issue
-            if (reportController.hasUserReportedIssue(userId, issueId)) {
-                JOptionPane.showMessageDialog(homeFrame, 
-                    "You have already reported this issue.", 
-                    "Notice", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+JLabel dislikeLabel = new JLabel(initialDislikeCount + " Dislikes");
+dislikeLabel.setFont(new Font("Arial", Font.BOLD, 12));
+
+// Use array to track state changes
+final boolean[] liked = {hasLiked};
+final boolean[] disliked = {hasDisliked};
+final int[] likeCount = {initialLikeCount};
+final int[] dislikeCount = {initialDislikeCount};
+
+// Update button appearance based on initial state
+if (liked[0]) {
+    likeButton.setText("Unlike 👍");
+    likeButton.setBackground(primaryColor);
+    likeButton.setForeground(Color.WHITE);
+} else {
+    likeButton.setBackground(new Color(240, 240, 240));
+    likeButton.setForeground(new Color(60, 60, 60));
+}
+
+if (disliked[0]) {
+    dislikeButton.setText("Undislike 👎");
+    dislikeButton.setBackground(primaryColor);
+    dislikeButton.setForeground(Color.WHITE);
+} else {
+    dislikeButton.setBackground(new Color(240, 240, 240));
+    dislikeButton.setForeground(new Color(60, 60, 60));
+}
+
+reportButton.setBackground(new Color(240, 240, 240));
+reportButton.setForeground(new Color(60, 60, 60));
+reportButton.setFont(new Font("Arial", Font.PLAIN, 12));
+
+// Like button action listener
+likeButton.addActionListener(e -> {
+    try {
+        if (!liked[0]) {
+            // Try to like the issue
+            Like like = new Like(issueId, this.username);
+            boolean success = issueController.likeIssue(like, userId);
             
-            // Show report dialog
-            showReportDialog(issueId, null);
-        });
+            if (success) {
+                // Like was successful
+                likeCount[0]++;
+                liked[0] = true;
+                likeButton.setText("Unlike 👍");
+                likeButton.setBackground(primaryColor);
+                likeButton.setForeground(Color.WHITE);
+                
+                // Handle dislike if necessary
+                if (disliked[0]) {
+                    dislikeCount[0]--;
+                    disliked[0] = false;
+                    dislikeButton.setText("Dislike 👎");
+                    dislikeButton.setBackground(new Color(240, 240, 240));
+                    dislikeButton.setForeground(new Color(60, 60, 60));
+                    dislikeLabel.setText(dislikeCount[0] + " Dislikes");
+                }
+            } else {
+                // Already liked (shouldn't happen with our initial check, but just in case)
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "You've already liked this issue.", 
+                    "Notice", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            // Unlike the issue
+            boolean success = issueController.undislikeIssue(userId, issueId);
+            
+            if (success) {
+                likeCount[0]--;
+                liked[0] = false;
+                likeButton.setText("Like 👍");
+                likeButton.setBackground(new Color(240, 240, 240));
+                likeButton.setForeground(new Color(60, 60, 60));
+            } else {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "Failed to unlike the issue. Please try again.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        // Update like count label
+        likeLabel.setText(likeCount[0] + " Likes");
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(homeFrame, 
+            "Error: " + ex.getMessage(), 
+            "Like Error", JOptionPane.ERROR_MESSAGE);
+    }
+});
 
-        buttonPanel.add(likeButton);
-        buttonPanel.add(likeLabel);
-        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        buttonPanel.add(dislikeButton);
-        buttonPanel.add(dislikeLabel);
-        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-        buttonPanel.add(reportButton);
+// Dislike button action listener
+dislikeButton.addActionListener(e -> {
+    try {
+        if (!disliked[0]) {
+            // Try to dislike the issue
+            Like like = new Like(issueId, this.username);
+            boolean success = issueController.dislikeIssue(like, userId);
+            
+            if (success) {
+                // Dislike was successful
+                dislikeCount[0]++;
+                disliked[0] = true;
+                dislikeButton.setText("Undislike 👎");
+                dislikeButton.setBackground(primaryColor);
+                dislikeButton.setForeground(Color.WHITE);
+                
+                // Handle like if necessary
+                if (liked[0]) {
+                    likeCount[0]--;
+                    liked[0] = false;
+                    likeButton.setText("Like 👍");
+                    likeButton.setBackground(new Color(240, 240, 240));
+                    likeButton.setForeground(new Color(60, 60, 60));
+                    likeLabel.setText(likeCount[0] + " Likes");
+                }
+            } else {
+                // Already disliked (shouldn't happen with our initial check, but just in case)
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "You've already disliked this issue.", 
+                    "Notice", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            // Undislike the issue
+            boolean success = issueController.undislikeIssue(userId, issueId);
+            
+            if (success) {
+                dislikeCount[0]--;
+                disliked[0] = false;
+                dislikeButton.setText("Dislike 👎");
+                dislikeButton.setBackground(new Color(240, 240, 240));
+                dislikeButton.setForeground(new Color(60, 60, 60));
+            } else {
+                JOptionPane.showMessageDialog(homeFrame, 
+                    "Failed to remove your dislike. Please try again.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        // Update dislike count label
+        dislikeLabel.setText(dislikeCount[0] + " Dislikes");
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(homeFrame, 
+            "Error: " + ex.getMessage(), 
+            "Dislike Error", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
+// Report button action listener
+reportButton.addActionListener(e -> {
+    // Check if user has already reported this issue
+    if (reportController.hasUserReportedIssue(userId, issueId)) {
+        JOptionPane.showMessageDialog(homeFrame, 
+            "You have already reported this issue.", 
+            "Notice", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+    
+    // Show report dialog
+    showReportDialog(issueId, null);
+});
+
+// Add components to button panel
+buttonPanel.add(likeButton);
+buttonPanel.add(likeLabel);
+buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+buttonPanel.add(dislikeButton);
+buttonPanel.add(dislikeLabel);
+buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+buttonPanel.add(reportButton);
 
         // ==== Comment Section ====
         JPanel commentSectionPanel = new JPanel();
