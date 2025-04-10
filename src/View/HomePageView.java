@@ -178,12 +178,12 @@ public class HomePageView {
         postsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         postsContainerPanel.add(postsScrollPane, BorderLayout.CENTER);
 
-        // Add components to center panel
+     
         centerPanel.add(newPostPanel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(postsContainerPanel);
 
-        // ==== Final Setup ====
+
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
