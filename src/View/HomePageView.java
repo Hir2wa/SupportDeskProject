@@ -224,7 +224,7 @@ public class HomePageView {
         loadIssues();
     }
     
-    // Helper method to create styled buttons without borders
+
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setBorderPainted(false);
@@ -237,7 +237,7 @@ public class HomePageView {
         return button;
     }
     
-    // Helper method to style text fields
+
     private void styleTextField(JTextField textField) {
         textField.setPreferredSize(new Dimension(250, 30));
         textField.setBorder(BorderFactory.createCompoundBorder(
