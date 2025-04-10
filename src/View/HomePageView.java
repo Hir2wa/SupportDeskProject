@@ -4,7 +4,8 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
+import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import Controller.IssueController;
 import Controller.ReportController;
 import Controller.UserController;
@@ -288,7 +289,10 @@ public class HomePageView {
                     posterUsername = posterUser != null ? posterUser.getUsername() : "Unknown User #" + issue.getUserId();
                 }
                 
-                JPanel postPanel = createPostPanel(issue.getDescription(), posterUsername, "Earlier", issue.getId());
+                // Format the timestamp
+                String timeDisplay = formatTimestamp(issue.getCreatedAt());
+                
+                JPanel postPanel = createPostPanel(issue.getDescription(), posterUsername, timeDisplay, issue.getId());
                 postsPanel.add(postPanel);
                 postsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
             }
@@ -296,6 +300,39 @@ public class HomePageView {
         
         postsPanel.revalidate();
         postsPanel.repaint();
+    }
+    
+    /**
+     * Format timestamp into a user-friendly string
+     * @param timestamp The timestamp to format
+     * @return A formatted string representation of the timestamp
+     */
+    private String formatTimestamp(Timestamp timestamp) {
+        if (timestamp == null) {
+            return "Unknown time";
+        }
+        
+        // Get current time
+        long currentTime = System.currentTimeMillis();
+        long timeDiff = currentTime - timestamp.getTime();
+        
+        // Format based on how long ago
+        if (timeDiff < 60000) { // Less than a minute
+            return "Just now";
+        } else if (timeDiff < 3600000) { // Less than an hour
+            long minutes = timeDiff / 60000;
+            return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
+        } else if (timeDiff < 86400000) { // Less than a day
+            long hours = timeDiff / 3600000;
+            return hours + (hours == 1 ? " hour ago" : " hours ago");
+        } else if (timeDiff < 604800000) { // Less than a week
+            long days = timeDiff / 86400000;
+            return days + (days == 1 ? " day ago" : " days ago");
+        } else {
+            // Format as date if older
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+            return sdf.format(timestamp);
+        }
     }
 
     // Helper method to create individual post panels with improved UI
