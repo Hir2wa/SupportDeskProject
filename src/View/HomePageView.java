@@ -505,13 +505,13 @@ dislikeButton.addActionListener(e -> {
                     likeLabel.setText(likeCount[0] + " Likes");
                 }
             } else {
-                // Already disliked (shouldn't happen with our initial check, but just in case)
+         
                 JOptionPane.showMessageDialog(homeFrame, 
                     "You've already disliked this issue.", 
                     "Notice", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            // Undislike the issue
+         
             boolean success = issueController.undislikeIssue(userId, issueId);
             
             if (success) {
