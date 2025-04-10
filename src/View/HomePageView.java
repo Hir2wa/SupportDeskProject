@@ -327,13 +327,12 @@ public class HomePageView {
             long days = timeDiff / 86400000;
             return days + (days == 1 ? " day ago" : " days ago");
         } else {
-            // Format as date if older
+          
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
             return sdf.format(timestamp);
         }
     }
 
-    // Helper method to create individual post panels with improved UI
     private JPanel createPostPanel(String postText, String username, String timeAgo, int issueId) {
         JPanel postPanel = new JPanel();
         postPanel.setLayout(new BoxLayout(postPanel, BoxLayout.Y_AXIS));
