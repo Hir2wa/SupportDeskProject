@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
+import Controller.ReportController;
 import Controller.IssueController;
 import Controller.UserController;
 import model.Issue;
@@ -30,13 +30,14 @@ public class HomePageView {
     private Color primaryColor = new Color(0, 102, 204);
     private Color accentColor = new Color(51, 153, 255);
     private Color lightGray = new Color(245, 245, 245);
+    private ReportController reportController;
 
     public HomePageView(String username, ImageIcon profilePic) {
         this.username = username;
         this.issueController = new IssueController();
         this.userController = new UserController();
         this.userId = getUserIdFromUsername(username);
-        
+        this.reportController = new ReportController();
         // ==== Frame setup ====
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
