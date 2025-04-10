@@ -154,7 +154,6 @@ public class HomePageView {
         newPostPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         newPostPanel.add(postButton);
 
-        // Panel for posts with scroll
         JPanel postsContainerPanel = new JPanel();
         postsContainerPanel.setLayout(new BorderLayout());
         postsContainerPanel.setBackground(Color.WHITE);
@@ -166,12 +165,12 @@ public class HomePageView {
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
 
-        // Create posts panel with vertical BoxLayout
+    
         postsPanel = new JPanel();
         postsPanel.setLayout(new BoxLayout(postsPanel, BoxLayout.Y_AXIS));
         postsPanel.setBackground(Color.WHITE);
         
-        // Add postsPanel to a JScrollPane for scrolling
+  
         JScrollPane postsScrollPane = new JScrollPane(postsPanel);
         postsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         postsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
