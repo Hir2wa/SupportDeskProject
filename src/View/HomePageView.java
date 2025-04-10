@@ -248,7 +248,7 @@ public class HomePageView {
         textField.setForeground(new Color(100, 100, 100));
     }
     
-    // Updated method to get user ID from username using the database
+
     private int getUserIdFromUsername(String username) {
         User user = userController.getUserByUsername(username);
         if (user != null) {
@@ -258,9 +258,9 @@ public class HomePageView {
         return -1;
     }
     
-    // Method to load existing issues from database
+
     private void loadIssues() {
-        // Clear existing posts
+    
         postsPanel.removeAll();
         
         // Get issues from controller
