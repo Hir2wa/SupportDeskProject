@@ -66,7 +66,7 @@ public class HomePageView {
 
         JLabel profileLabel = new JLabel();
         if (profilePic != null) {
-            // Scale profile picture if too large
+        
             if (profilePic.getIconWidth() > 40 || profilePic.getIconHeight() > 40) {
                 Image img = profilePic.getImage();
                 Image newImg = img.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
@@ -111,7 +111,7 @@ public class HomePageView {
         topPanel.add(leftTop, BorderLayout.WEST);
         topPanel.add(rightTop, BorderLayout.EAST);
 
-        // ==== Center Section - Issue Post Button ====
+    
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
