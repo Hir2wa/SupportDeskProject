@@ -709,7 +709,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         reportCommentButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         reportCommentButton.addActionListener(e -> {
-            // Check if the user has already reported this comment
+      
             if (reportController.hasUserReportedComment(userId, comment.getId())) {
                 JOptionPane.showMessageDialog(homeFrame, 
                     "You have already reported this comment.", 
@@ -717,7 +717,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                 return;
             }
             
-            // Show report dialog
+          
             showReportDialog(null, comment.getId());
         });
         
@@ -729,7 +729,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         return commentPanel;
     }
     
-    // Method to display the report dialog
+  
     private void showReportDialog(Integer issueId, Integer commentId) {
         JDialog reportDialog = new JDialog(homeFrame, "Report", true);
         reportDialog.setSize(400, 300);
@@ -799,7 +799,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
         submitButton.addActionListener(e -> {
             String selectedReason = (String) reasonComboBox.getSelectedItem();
             
-            // Check if a valid reason is selected
+         
             if (selectedReason == null || selectedReason.equals("Select a reason...")) {
                 JOptionPane.showMessageDialog(reportDialog, 
                     "Please select a reason for your report.", 
@@ -807,7 +807,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                 return;
             }
         
-            // Build the full reason
+          
             String fullReason = selectedReason;
             String additionalDetails = detailsArea.getText().trim();
             
