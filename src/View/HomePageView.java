@@ -551,7 +551,7 @@ reportButton.addActionListener(e -> {
     showReportDialog(issueId, null);
 });
 
-// Add components to button panel
+
 buttonPanel.add(likeButton);
 buttonPanel.add(likeLabel);
 buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -560,7 +560,7 @@ buttonPanel.add(dislikeLabel);
 buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 buttonPanel.add(reportButton);
 
-        // ==== Comment Section ====
+
         JPanel commentSectionPanel = new JPanel();
         commentSectionPanel.setLayout(new BoxLayout(commentSectionPanel, BoxLayout.Y_AXIS));
         commentSectionPanel.setBackground(Color.WHITE);
@@ -574,16 +574,15 @@ buttonPanel.add(reportButton);
         commentsTitle.setFont(new Font("Arial", Font.BOLD, 14));
         commentsTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        // Load existing comments for this issue
+ 
         List<Comment> comments = issueController.getCommentsForIssue(issueId);
-        
-        // Create a panel to hold all comments
+    
         JPanel commentsContainer = new JPanel();
         commentsContainer.setLayout(new BoxLayout(commentsContainer, BoxLayout.Y_AXIS));
         commentsContainer.setBackground(Color.WHITE);
         commentsContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        // Add existing comments to the container
+    
         if (comments != null && !comments.isEmpty()) {
             for (Comment comment : comments) {
                 // Get username for this comment
