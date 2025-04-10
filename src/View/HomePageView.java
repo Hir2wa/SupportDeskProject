@@ -846,7 +846,7 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace(); // Log for debugging purposes
+                ex.printStackTrace(); 
                 JOptionPane.showMessageDialog(reportDialog, 
                     "An unexpected error occurred. Please try again.", 
                     "Error", JOptionPane.ERROR_MESSAGE);
