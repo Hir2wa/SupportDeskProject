@@ -201,11 +201,11 @@ public class HomePageView {
                     newIssue.setDescription(postText);
                     newIssue.setUserId(userId);
                     
-                    // Save to database using controller
+         
                     boolean posted = issueController.postIssue(newIssue, userId);
                     
                     if (posted) {
-                        // If successfully posted, load all issues again
+                
                         loadIssues();
                         
                         // Clear the text area after posting
