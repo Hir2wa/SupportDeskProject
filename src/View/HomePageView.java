@@ -84,7 +84,7 @@ public class HomePageView {
 public void actionPerformed(ActionEvent e) {
     User user = userController.getUserByUsername(username);
 
-    // 🖼️ Create a fallback image in case loading fails
+    
     BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = fallbackImg.createGraphics();
     g2d.setColor(new Color(0, 102, 204));
