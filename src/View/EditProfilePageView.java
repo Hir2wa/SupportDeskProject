@@ -26,7 +26,7 @@ public class EditProfilePageView {
         g2d.dispose();
         ImageIcon defaultPic = new ImageIcon(fallbackImg);
         
-        // Try to load from file system
+        
         try {
             File imageFile = new File("Assets/LogoSupportDesk.png");
             if (imageFile.exists()) {
