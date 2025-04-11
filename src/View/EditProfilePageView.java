@@ -149,28 +149,5 @@ public class EditProfilePageView {
 
         return new ImageIcon(roundedImage);
     }
-    
-    // Create a default profile icon if none is available
-    private ImageIcon createDefaultProfileIcon(int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
-        
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        // Fill background with a color
-        g2d.setColor(new Color(70, 130, 180)); // Steel blue
-        g2d.fillOval(0, 0, width, height);
-        
-        // Add initials or icon
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, width/2));
-        FontMetrics fm = g2d.getFontMetrics();
-        String text = "U"; // For User
-        int textX = (width - fm.stringWidth(text)) / 2;
-        int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();
-        g2d.drawString(text, textX, textY);
-        
-        g2d.dispose();
-        return new ImageIcon(image);
-    }
+  
 }
