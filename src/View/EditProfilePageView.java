@@ -33,7 +33,7 @@ public class EditProfilePageView {
                 defaultPic = new ImageIcon(imageFile.getAbsolutePath());
             }
         } catch (Exception ex) {
-            // Keep using the fallback image we created above
+            ex.printStackTrace();
         }
         
         // Use the default picture since we're not getting it from User anymore
