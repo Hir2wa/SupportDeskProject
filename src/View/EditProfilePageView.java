@@ -97,13 +97,9 @@ public class EditProfilePageView {
         gbc.gridx = 0;
         gbc.gridwidth = 2;
         editPanel.add(saveButton, gbc);
-
-        // ==== Finalize ====
         mainPanel.add(editPanel, BorderLayout.CENTER);
         editFrame.setContentPane(mainPanel);
         editFrame.setVisible(true);
-
-        // ==== Save Logic ====
         saveButton.addActionListener(e -> {
             String newUsername = usernameField.getText().trim();
             String newEmail = emailField.getText().trim();
