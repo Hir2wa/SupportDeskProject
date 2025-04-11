@@ -36,7 +36,7 @@ public class EditProfilePageView {
             ex.printStackTrace();
         }
         
-        // Use the default picture since we're not getting it from User anymore
+        
         ImageIcon finalProfilePic = defaultPic;
 
         // ==== Frame Setup ====
