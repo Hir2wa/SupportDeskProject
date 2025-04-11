@@ -20,6 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 public class HomePageView {
@@ -82,25 +84,46 @@ public class HomePageView {
         profileButton.setForeground(Color.WHITE);
         profileButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                // 🧠 Fetch user details
-                User user = userController.getUserByUsername(username);
-        
-                if (user != null) {
-                    // 🧮 Fetch stats
-                    int issuesSubmitted = issueController.countIssuesByUserId(user.getId());
-                    int likesReceived = issueController.countLikesReceivedByUserId(user.getId());
-                    int commentsReceived = issueController.countCommentsReceivedByUserId(user.getId());
-                    int commentsMade = issueController.countCommentsMadeByUserId(user.getId());
-        
-                    // 🚀 Launch the profile view
-                    new ProfileView(user.getUsername(), user.getEmail(), profilePic,
-                                    issuesSubmitted, likesReceived, commentsReceived, commentsMade);
-                } else {
-                    JOptionPane.showMessageDialog(homeFrame, "User info not found!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+public void actionPerformed(ActionEvent e) {
+    // 🧠 Fetch user details
+    User user = userController.getUserByUsername(username);
+
+    // 🖼️ Create a fallback image in case loading fails
+    BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2d = fallbackImg.createGraphics();
+    g2d.setColor(new Color(0, 102, 204));
+    g2d.fillRect(0, 0, 100, 100);
+    g2d.dispose();
+    ImageIcon defaultPic = new ImageIcon(fallbackImg);
+    
+    // Try to load from file system
+    try {
+        File imageFile = new File("Assets/LogoSupportDesk.png");
+        if (imageFile.exists()) {
+            defaultPic = new ImageIcon(imageFile.getAbsolutePath());
+        }
+    } catch (Exception ex) {
+        // Keep using the fallback image we created above
+    }
+    
+    ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
+
+    if (user != null) {
+        // 🧮 Fetch stats
+        int issuesSubmitted = issueController.countIssuesByUserId(user.getId());
+        int likesReceived = issueController.countLikesReceivedByUserId(user.getId());
+        int commentsReceived = issueController.countCommentsReceivedByUserId(user.getId());
+        int commentsMade = issueController.countCommentsMadeByUserId(user.getId());
+
+        // 🚀 Launch the profile view with correct pic
+        new ProfileView(user.getUsername(), user.getEmail(), finalProfilePic,
+                        issuesSubmitted, likesReceived, commentsReceived, commentsMade);
+    } else {
+        JOptionPane.showMessageDialog(homeFrame, "User info not found!", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
         });
+        
         
 
         JTextField searchField = new JTextField("Search issues or users...");

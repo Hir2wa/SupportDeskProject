@@ -2,6 +2,8 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class ProfileView {
 
@@ -38,13 +40,33 @@ public class ProfileView {
         gbc.anchor = GridBagConstraints.CENTER;
 
         // ==== Profile Picture ====
-        gbc.gridy = 0;
-        JLabel profileLabel = new JLabel();
-        Image image = profilePic.getImage();
-        Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-        profileLabel.setIcon(new ImageIcon(scaledImage));
-        profilePanel.add(profileLabel, gbc);
+       gbc.gridy = 0;
+JLabel profileLabel = new JLabel();
 
+// Create a fallback image in case loading fails
+BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+Graphics2D g2d = fallbackImg.createGraphics();
+g2d.setColor(new Color(0, 102, 204));
+g2d.fillRect(0, 0, 100, 100);
+g2d.dispose();
+ImageIcon defaultPic = new ImageIcon(fallbackImg);
+
+// Try to load from file system
+try {
+    File imageFile = new File("Assets/LogoSupportDesk.png");
+    if (imageFile.exists()) {
+        defaultPic = new ImageIcon(imageFile.getAbsolutePath());
+    }
+} catch (Exception ex) {
+    // Keep using the fallback image
+}
+
+ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
+
+Image image = finalProfilePic.getImage();
+Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+profileLabel.setIcon(new ImageIcon(scaledImage));
+profilePanel.add(profileLabel, gbc);
         // ==== Username ====
         gbc.gridy++;
         JLabel usernameLabel = new JLabel("Username: " + username);
