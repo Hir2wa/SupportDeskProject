@@ -111,7 +111,7 @@ public void actionPerformed(ActionEvent e) {
         int commentsReceived = issueController.countCommentsReceivedByUserId(user.getId());
         int commentsMade = issueController.countCommentsMadeByUserId(user.getId());
 
-        // 🚀 Launch the profile view with correct pic
+     
         new ProfileView(user.getUsername(), user.getEmail(), finalProfilePic,
                         issuesSubmitted, likesReceived, commentsReceived, commentsMade);
     } else {
