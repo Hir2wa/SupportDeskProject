@@ -74,8 +74,6 @@ public class EditProfilePageView {
         JTextField usernameField = new JTextField(username, 20);
         gbc.gridx = 1;
         editPanel.add(usernameField, gbc);
-
-        // ==== Email ====
         gbc.gridy++;
         gbc.gridx = 0;
         editPanel.add(new JLabel("Email:"), gbc);
