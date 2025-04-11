@@ -136,10 +136,6 @@ public class EditProfilePageView {
             }
         });
     }
-
-   
-
-    // === Resize and round the icon ===
     private ImageIcon resizeAndRoundIcon(ImageIcon originalIcon, int width, int height) {
         Image img = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage roundedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
