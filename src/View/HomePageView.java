@@ -80,6 +80,28 @@ public class HomePageView {
         JButton profileButton = createStyledButton("View Profile", primaryColor);
         profileButton.setFont(new Font("Arial", Font.PLAIN, 12));
         profileButton.setForeground(Color.WHITE);
+        profileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 🧠 Fetch user details
+                User user = userController.getUserByUsername(username);
+        
+                if (user != null) {
+                    // 🧮 Fetch stats
+                    int issuesSubmitted = issueController.countIssuesByUserId(user.getId());
+                    int likesReceived = issueController.countLikesReceivedByUserId(user.getId());
+                    int commentsReceived = issueController.countCommentsReceivedByUserId(user.getId());
+                    int commentsMade = issueController.countCommentsMadeByUserId(user.getId());
+        
+                    // 🚀 Launch the profile view
+                    new ProfileView(user.getUsername(), user.getEmail(), profilePic,
+                                    issuesSubmitted, likesReceived, commentsReceived, commentsMade);
+                } else {
+                    JOptionPane.showMessageDialog(homeFrame, "User info not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
 
         JTextField searchField = new JTextField("Search issues or users...");
         styleTextField(searchField);

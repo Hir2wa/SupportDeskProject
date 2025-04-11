@@ -116,4 +116,68 @@ public class UserController {
         }
         return null;
     }
+
+    // 🧮 Count total issues submitted by a user
+public int countIssuesByUserId(int userId) {
+    String sql = "SELECT COUNT(*) FROM issues WHERE user_id = ?";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+// ❤️ Count likes received on user's issues
+public int countLikesReceivedByUserId(int userId) {
+    String sql = "SELECT SUM(likes) FROM issues WHERE user_id = ?";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+// 💬 Count comments received on user's issues
+public int countCommentsReceivedByUserId(int userId) {
+    String sql = "SELECT COUNT(*) FROM comments WHERE issue_id IN (SELECT id FROM issues WHERE user_id = ?)";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+// 💭 Count comments made by the user on any issue
+public int countCommentsMadeByUserId(int userId) {
+    String sql = "SELECT COUNT(*) FROM comments WHERE user_id = ?";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+
+
+
 }
