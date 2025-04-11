@@ -127,8 +127,6 @@ public class EditProfilePageView {
                     "Profile updated successfully!", 
                     "Success", 
                     JOptionPane.INFORMATION_MESSAGE);
-                
-                // Close the window
                 editFrame.dispose();
             } else {
                 JOptionPane.showMessageDialog(editFrame, 
