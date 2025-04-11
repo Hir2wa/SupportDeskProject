@@ -59,8 +59,6 @@ public class EditProfilePageView {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // ==== Profile Picture ====
         JLabel profileLabel = new JLabel();
         profileLabel.setIcon(resizeAndRoundIcon(finalProfilePic, 100, 100));
         profileLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -68,8 +66,6 @@ public class EditProfilePageView {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         editPanel.add(profileLabel, gbc);
-
-        // ==== Username ====
         gbc.gridy++;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
