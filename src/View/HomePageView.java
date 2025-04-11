@@ -105,7 +105,7 @@ public void actionPerformed(ActionEvent e) {
     ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
 
     if (user != null) {
-        // 🧮 Fetch stats
+        
         int issuesSubmitted = issueController.countIssuesByUserId(user.getId());
         int likesReceived = issueController.countLikesReceivedByUserId(user.getId());
         int commentsReceived = issueController.countCommentsReceivedByUserId(user.getId());
