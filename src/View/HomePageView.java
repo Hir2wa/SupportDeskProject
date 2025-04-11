@@ -44,7 +44,7 @@ public class HomePageView {
         this.reportController = new ReportController();
         this.userId = getUserIdFromUsername(username);
         
-        // ==== Frame setup ====
+  
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         homeFrame.setSize(900, 800);
