@@ -54,7 +54,7 @@ public class HomePageView {
         mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.setBackground(Color.WHITE);
 
-        // ==== Top Section ====
+ 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         topPanel.setBackground(primaryColor);
