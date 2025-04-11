@@ -16,8 +16,6 @@ public class EditProfilePageView {
     public EditProfilePageView(User user, UserController controller) {
         this.currentUser = user;
         this.userController = controller;
-        
-        // Display the existing user information
         String username = user.getUsername();
         String email = user.getEmail();
         
