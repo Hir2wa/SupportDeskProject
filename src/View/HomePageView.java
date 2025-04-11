@@ -99,7 +99,7 @@ public void actionPerformed(ActionEvent e) {
             defaultPic = new ImageIcon(imageFile.getAbsolutePath());
         }
     } catch (Exception ex) {
-        // Keep using the fallback image we created above
+        ex.printStackTrace();
     }
     
     ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
