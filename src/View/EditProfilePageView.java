@@ -45,8 +45,6 @@ public class EditProfilePageView {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
-
-        // ==== Panel ====
         JPanel editPanel = new JPanel(new GridBagLayout());
         editPanel.setBackground(Color.WHITE);
         editPanel.setBorder(BorderFactory.createTitledBorder(
