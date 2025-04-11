@@ -32,9 +32,6 @@ public class HomePageView {
     private IssueController issueController;
     private UserController userController;
     private ReportController reportController;
-    private JTextField commentInput;
-    private Integer issueId;
-    private JPanel commentSectionPanel;
     private int userId;
     private Color primaryColor = new Color(0, 102, 204);
     private Color accentColor = new Color(51, 153, 255);
