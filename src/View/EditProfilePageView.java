@@ -81,8 +81,6 @@ public class EditProfilePageView {
         JTextField emailField = new JTextField(email, 20);
         gbc.gridx = 1;
         editPanel.add(emailField, gbc);
-
-        // ==== Password ====
         gbc.gridy++;
         gbc.gridx = 0;
         editPanel.add(new JLabel("Password (optional):"), gbc);
@@ -90,8 +88,6 @@ public class EditProfilePageView {
         JPasswordField passwordField = new JPasswordField(20);
         gbc.gridx = 1;
         editPanel.add(passwordField, gbc);
-
-        // ==== Save Button ====
         JButton saveButton = new JButton("💾 Save Changes");
         saveButton.setBackground(new Color(0, 102, 204));
         saveButton.setForeground(Color.WHITE);
