@@ -341,11 +341,6 @@ public void actionPerformed(ActionEvent e) {
         postsPanel.repaint();
     }
     
-    /**
-     * Format timestamp into a user-friendly string
-     * @param timestamp The timestamp to format
-     * @return A formatted string representation of the timestamp
-     */
     private String formatTimestamp(Timestamp timestamp) {
         if (timestamp == null) {
             return "Unknown time";
