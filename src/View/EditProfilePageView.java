@@ -104,8 +104,6 @@ public class EditProfilePageView {
             String newUsername = usernameField.getText().trim();
             String newEmail = emailField.getText().trim();
             String newPassword = new String(passwordField.getPassword()).trim();
-
-            // Validate inputs before saving
             if (newUsername.isEmpty() || newEmail.isEmpty()) {
                 JOptionPane.showMessageDialog(editFrame, 
                     "Username and email cannot be empty!", 
@@ -113,8 +111,6 @@ public class EditProfilePageView {
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
-            // Use the controller to update the user
             boolean updated = userController.updateUser(
                 currentUser.getId(), 
                 newUsername, 
