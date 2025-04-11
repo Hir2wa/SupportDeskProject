@@ -82,7 +82,6 @@ public class HomePageView {
         profileButton.addActionListener(new ActionListener() {
             @Override
 public void actionPerformed(ActionEvent e) {
-    // 🧠 Fetch user details
     User user = userController.getUserByUsername(username);
 
     // 🖼️ Create a fallback image in case loading fails
