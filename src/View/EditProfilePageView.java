@@ -38,8 +38,6 @@ public class EditProfilePageView {
         
         
         ImageIcon finalProfilePic = defaultPic;
-
-        // ==== Frame Setup ====
         editFrame = new JFrame("Edit Profile");
         editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         editFrame.setSize(450, 500);
