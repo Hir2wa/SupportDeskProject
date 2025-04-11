@@ -118,14 +118,11 @@ public class EditProfilePageView {
                 newPassword);
                 
             if (updated) {
-                // Update the user object with new values
                 currentUser.setUsername(newUsername);
                 currentUser.setEmail(newEmail);
                 if (!newPassword.isEmpty()) {
                     currentUser.setPassword(newPassword);
                 }
-                
-                // Show confirmation
                 JOptionPane.showMessageDialog(editFrame, 
                     "Profile updated successfully!", 
                     "Success", 
