@@ -1,14 +1,46 @@
 package View;
 
+import Controller.UserController;
+import model.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class EditProfilePageView {
 
     private JFrame editFrame;
+    private UserController userController;
+    private User currentUser;
 
-    public EditProfilePageView(String username, String email, ImageIcon profilePic) {
+    public EditProfilePageView(User user, UserController controller) {
+        this.currentUser = user;
+        this.userController = controller;
+        
+        // Display the existing user information
+        String username = user.getUsername();
+        String email = user.getEmail();
+        
+        // Create a fallback image
+        BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = fallbackImg.createGraphics();
+        g2d.setColor(new Color(0, 102, 204));
+        g2d.fillRect(0, 0, 100, 100);
+        g2d.dispose();
+        ImageIcon defaultPic = new ImageIcon(fallbackImg);
+        
+        // Try to load from file system
+        try {
+            File imageFile = new File("Assets/LogoSupportDesk.png");
+            if (imageFile.exists()) {
+                defaultPic = new ImageIcon(imageFile.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            // Keep using the fallback image we created above
+        }
+        
+        // Use the default picture since we're not getting it from User anymore
+        ImageIcon finalProfilePic = defaultPic;
 
         // ==== Frame Setup ====
         editFrame = new JFrame("Edit Profile");
@@ -37,7 +69,7 @@ public class EditProfilePageView {
 
         // ==== Profile Picture ====
         JLabel profileLabel = new JLabel();
-        profileLabel.setIcon(resizeAndRoundIcon(profilePic, 100, 100));
+        profileLabel.setIcon(resizeAndRoundIcon(finalProfilePic, 100, 100));
         profileLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -94,19 +126,48 @@ public class EditProfilePageView {
             String newEmail = emailField.getText().trim();
             String newPassword = new String(passwordField.getPassword()).trim();
 
-            // 🎯 PLACE TO ADD: Save to database, file, or controller
-            System.out.println("Saving new profile info:");
-            System.out.println("Username: " + newUsername);
-            System.out.println("Email: " + newEmail);
-            System.out.println("Password: " + (newPassword.isEmpty() ? "[unchanged]" : "[updated]"));
-
-            // 💬 Show confirmation
-            JOptionPane.showMessageDialog(editFrame, "Profile updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            // Optionally close or refresh the view
-            editFrame.dispose();
+            // Validate inputs before saving
+            if (newUsername.isEmpty() || newEmail.isEmpty()) {
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Username and email cannot be empty!", 
+                    "Validation Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Use the controller to update the user
+            boolean updated = userController.updateUser(
+                currentUser.getId(), 
+                newUsername, 
+                newEmail, 
+                newPassword);
+                
+            if (updated) {
+                // Update the user object with new values
+                currentUser.setUsername(newUsername);
+                currentUser.setEmail(newEmail);
+                if (!newPassword.isEmpty()) {
+                    currentUser.setPassword(newPassword);
+                }
+                
+                // Show confirmation
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Profile updated successfully!", 
+                    "Success", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                // Close the window
+                editFrame.dispose();
+            } else {
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Failed to update profile. Please try again.", 
+                    "Update Failed", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
         });
     }
+
+   
 
     // === Resize and round the icon ===
     private ImageIcon resizeAndRoundIcon(ImageIcon originalIcon, int width, int height) {
@@ -121,5 +182,29 @@ public class EditProfilePageView {
         g2d.dispose();
 
         return new ImageIcon(roundedImage);
+    }
+    
+    // Create a default profile icon if none is available
+    private ImageIcon createDefaultProfileIcon(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Fill background with a color
+        g2d.setColor(new Color(70, 130, 180)); // Steel blue
+        g2d.fillOval(0, 0, width, height);
+        
+        // Add initials or icon
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, width/2));
+        FontMetrics fm = g2d.getFontMetrics();
+        String text = "U"; // For User
+        int textX = (width - fm.stringWidth(text)) / 2;
+        int textY = ((height - fm.getHeight()) / 2) + fm.getAscent();
+        g2d.drawString(text, textX, textY);
+        
+        g2d.dispose();
+        return new ImageIcon(image);
     }
 }

@@ -178,6 +178,38 @@ public int countCommentsMadeByUserId(int userId) {
 }
 
 
-
+// 🔄 Update user information
+public boolean updateUser(int userId, String username, String email, String password) {
+    // If password is empty, don't update it
+    if (password.isEmpty()) {
+        String sql = "UPDATE users SET username = ?, email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            stmt.setInt(3, userId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("⚠️ Update failed");
+            e.printStackTrace();
+            return false;
+        }
+    } else {
+        // Update including password
+        String sql = "UPDATE users SET username = ?, email = ?, password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            stmt.setString(3, password);
+            stmt.setInt(4, userId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("⚠️ Update failed");
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
 
 }

@@ -1,6 +1,10 @@
 package View;
 
 import javax.swing.*;
+
+import Controller.UserController;
+import model.User;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -115,8 +119,18 @@ profilePanel.add(profileLabel, gbc);
         profileFrame.setVisible(true);
 
         // ==== Edit Button Action ====
-        editProfileButton.addActionListener(e -> {
-            new EditProfilePageView(username, email, profilePic);
-        });
+    editProfileButton.addActionListener(e -> {
+    // Create User object
+    User user = new User();
+    user.setUsername(username);
+    user.setEmail(email);
+    // Note: No need to set profilePic since we're loading it from file
+    
+    // Create UserController
+    UserController controller = new UserController();
+    
+    // Call constructor with proper parameters
+    new EditProfilePageView(user, controller);
+});
     }
 }
