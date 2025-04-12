@@ -101,9 +101,44 @@ public class EditProfilePageView {
         editFrame.setContentPane(mainPanel);
         editFrame.setVisible(true);
         saveButton.addActionListener(e -> {
+            System.out.println("Save button clicked");
+            
+            // First, check if controller is null
+            if (userController == null) {
+                System.out.println("ERROR: UserController is null!");
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Internal error: Controller not found.", 
+                    "System Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Check if user is null or has invalid ID
+            if (currentUser == null) {
+                System.out.println("ERROR: Current user is null!");
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Internal error: User data not found.", 
+                    "System Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            System.out.println("Current user ID: " + currentUser.getId());
+            
+            // Check if the user ID is valid
+            if (currentUser.getId() <= 0) {
+                System.out.println("ERROR: Invalid user ID: " + currentUser.getId());
+                JOptionPane.showMessageDialog(editFrame, 
+                    "Cannot update profile: Invalid user ID", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             String newUsername = usernameField.getText().trim();
             String newEmail = emailField.getText().trim();
             String newPassword = new String(passwordField.getPassword()).trim();
+            
             if (newUsername.isEmpty() || newEmail.isEmpty()) {
                 JOptionPane.showMessageDialog(editFrame, 
                     "Username and email cannot be empty!", 
@@ -111,11 +146,19 @@ public class EditProfilePageView {
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
+            System.out.println("Attempting to update user with ID: " + currentUser.getId());
+            System.out.println("New username: " + newUsername);
+            System.out.println("New email: " + newEmail);
+            System.out.println("Password change requested: " + (!newPassword.isEmpty()));
+            
             boolean updated = userController.updateUser(
                 currentUser.getId(), 
                 newUsername, 
                 newEmail, 
                 newPassword);
+            
+            System.out.println("Update result: " + (updated ? "SUCCESS" : "FAILED"));
                 
             if (updated) {
                 currentUser.setUsername(newUsername);

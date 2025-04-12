@@ -888,13 +888,21 @@ submitComment.addActionListener(e -> extracted(username, issueId, commentSection
                     "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-        
+        User loggedInUser = userController.getUserByUsername(username);
+// Check that the user has a valid ID
+if (loggedInUser != null && loggedInUser.getId() > 0) {
+    // Proceed with the application
+} else {
+    // Handle error
+}
 
 reportDialog.setContentPane(dialogPanel);
 reportDialog.setVisible(true);
 
        
     }
+    // After successful login validation
+
     
    
    

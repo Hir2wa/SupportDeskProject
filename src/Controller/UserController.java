@@ -188,6 +188,11 @@ public boolean updateUser(int userId, String username, String email, String pass
             stmt.setString(2, email);
             stmt.setInt(3, userId);
             int rows = stmt.executeUpdate();
+            System.out.println("Attempting to update user ID: " + userId);
+            System.out.println("New username: " + username);
+            System.out.println("New email: " + email);
+            // After executing the statement:
+            System.out.println("Rows affected: " + rows);
             return rows > 0;
         } catch (SQLException e) {
             System.out.println("⚠️ Update failed");

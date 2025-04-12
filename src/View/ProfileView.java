@@ -119,18 +119,23 @@ profilePanel.add(profileLabel, gbc);
         profileFrame.setVisible(true);
 
         // ==== Edit Button Action ====
-    editProfileButton.addActionListener(e -> {
-    // Create User object
-    User user = new User();
-    user.setUsername(username);
-    user.setEmail(email);
-    // Note: No need to set profilePic since we're loading it from file
-    
-    // Create UserController
+// In ProfileView's editProfileButton action listener:
+editProfileButton.addActionListener(e -> {
+    // Create UserController first
     UserController controller = new UserController();
     
-    // Call constructor with proper parameters
-    new EditProfilePageView(user, controller);
+    // Look up the complete user from the database
+    User user = controller.getUserByUsername(username);
+    
+    if (user != null) {
+        // Now we have the user with correct ID from database
+        new EditProfilePageView(user, controller);
+    } else {
+        JOptionPane.showMessageDialog(profileFrame, 
+            "Error: Could not retrieve user data from database", 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+    }
 });
     }
 }
