@@ -14,6 +14,14 @@ public class Issue {
     
     // Constructors
     public Issue() {}
+    public Issue(int id, int userId, String title, String description, String status, Timestamp createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
     
     public Issue(int userId, String title, String description) {
         this.userId = userId;

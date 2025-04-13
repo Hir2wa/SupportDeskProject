@@ -14,7 +14,9 @@ import model.Like;
 import model.Comment;
 import model.Report;
 import model.User;
-
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.Cursor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -121,36 +123,64 @@ public void actionPerformed(ActionEvent e) {
         });
         
         
+// Create search field with placeholder text
+JTextField searchField = new JTextField("Search issues or users...");
+styleTextField(searchField);
+searchField.addFocusListener(new FocusListener() {
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (searchField.getText().equals("Search issues or users...")) {
+            searchField.setText("");
+        }
+    }
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (searchField.getText().isEmpty()) {
+            searchField.setText("Search issues or users...");
+        }
+    }
+});
 
-        JTextField searchField = new JTextField("Search issues or users...");
-        styleTextField(searchField);
-        searchField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals("Search issues or users...")) {
-                    searchField.setText("");
-                }
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search issues or users...");
-                }
-            }
-        });
+// Add key listener to search when Enter is pressed
+searchField.addKeyListener(new KeyAdapter() {
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            performSearch(searchField.getText());
+        }
+    }
+});
 
-        JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        leftTop.setOpaque(false);
-        leftTop.add(profileLabel);
-        leftTop.add(welcomeLabel);
-        leftTop.add(profileButton);
+// Create search button
+JButton searchButton = new JButton("🔍");
+searchButton.setFocusPainted(false);
+searchButton.setFont(new Font("Arial", Font.PLAIN, 14));
+searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+searchButton.setBackground(new Color(0, 102, 204));
+searchButton.setForeground(Color.WHITE);
+searchButton.addActionListener(e -> performSearch(searchField.getText()));
 
-        JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        rightTop.setOpaque(false);
-        rightTop.add(searchField);
+// Create a panel to hold the search field and button
+JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
+searchPanel.setOpaque(false);
+searchPanel.add(searchField, BorderLayout.CENTER);
+searchPanel.add(searchButton, BorderLayout.EAST);
 
-        topPanel.add(leftTop, BorderLayout.WEST);
-        topPanel.add(rightTop, BorderLayout.EAST);
+JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+leftTop.setOpaque(false);
+leftTop.add(profileLabel);
+leftTop.add(welcomeLabel);
+leftTop.add(profileButton);
+
+JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+rightTop.setOpaque(false);
+rightTop.add(searchPanel);  // Added searchPanel instead of just searchField
+
+topPanel.add(leftTop, BorderLayout.WEST);
+topPanel.add(rightTop, BorderLayout.EAST);
+
+
+
 
     
         JPanel centerPanel = new JPanel();
@@ -265,6 +295,14 @@ public void actionPerformed(ActionEvent e) {
         loadIssues();
     }
     
+    private void performSearch(String query) {
+        query = query.trim();
+        if (!query.isEmpty() && !query.equals("Search issues or users...")) {
+            // Create controller and perform search
+            UserController controller = new UserController();
+            new SearchResultsView(query, controller);
+        }
+    }
 
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);

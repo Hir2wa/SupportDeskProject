@@ -217,4 +217,74 @@ public boolean updateUser(int userId, String username, String email, String pass
     }
 }
 
+// 🔍 Search for users by username or email pattern
+public java.util.ArrayList<User> searchUsers(String searchQuery) {
+    String sql = "SELECT * FROM users WHERE username LIKE ? OR email LIKE ? OR full_name LIKE ?";
+    java.util.ArrayList<User> results = new java.util.ArrayList<>();
+    
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String pattern = "%" + searchQuery + "%";
+        stmt.setString(1, pattern);
+        stmt.setString(2, pattern);
+        stmt.setString(3, pattern);
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            User user = new User(
+                rs.getInt("id"),
+                rs.getString("full_name"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password")
+            );
+            
+            user.setCreatedAt(rs.getTimestamp("created_at"));
+            user.setUpdatedAt(rs.getTimestamp("updated_at"));
+            
+            results.add(user);
+        }
+    } catch (SQLException e) {
+        System.out.println("⚠️ Search users failed");
+        e.printStackTrace();
+    }
+    
+    return results;
+}
+
+// 🔍 Search for issues by title or description
+public java.util.ArrayList<model.Issue> searchIssues(String searchQuery) {
+    String sql = "SELECT * FROM issues WHERE title LIKE ? OR description LIKE ?";
+    java.util.ArrayList<model.Issue> results = new java.util.ArrayList<>();
+    
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String pattern = "%" + searchQuery + "%";
+        stmt.setString(1, pattern);
+        stmt.setString(2, pattern);
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            model.Issue issue = new model.Issue(
+                rs.getInt("id"),
+                rs.getInt("user_id"),
+                rs.getString("title"),
+                rs.getString("description"),
+                rs.getString("status"),
+                rs.getTimestamp("created_at")
+            );
+            
+            // Assuming there's a setLikes method in your Issue class
+            issue.setLikes(rs.getInt("likes"));
+            
+            results.add(issue);
+        }
+    } catch (SQLException e) {
+        System.out.println("⚠️ Search issues failed");
+        e.printStackTrace();
+    }
+    
+    return results;
+}
+
 }
