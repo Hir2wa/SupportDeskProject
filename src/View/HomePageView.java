@@ -5,6 +5,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.text.SimpleDateFormat;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import Controller.IssueController;
 import Controller.ReportController;
@@ -290,10 +293,14 @@ topPanel.add(rightTop, BorderLayout.EAST);
                 }
             }
         });
-        
-  
+        userController.debugGetUserById(userId);
+      userController.debugDatabaseStructure();
+      userController.debugSampleData();
+userController.testMultipleSearchTerms();
         loadIssues();
     }
+    // Add this debugging method to your UserController
+
     
  public void performSearch(String query) {
     query = query.trim();

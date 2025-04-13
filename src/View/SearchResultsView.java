@@ -51,13 +51,20 @@ public class SearchResultsView {
     private JPanel createUsersPanel(ArrayList<User> users) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+        System.out.println("Creating users panel with " + users.size() + " users");
         // Create header with search info
         JLabel headerLabel = new JLabel("Found " + users.size() + " users matching \"" + searchQuery + "\"");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
         headerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         panel.add(headerLabel, BorderLayout.NORTH);
-        
+         
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        for (User user : users) {
+            String displayText = user.getUsername() + " (" + user.getEmail() + ")";
+            System.out.println("Adding to list model: " + displayText);
+            listModel.addElement(displayText);
+        }
+
         if (users.isEmpty()) {
             JLabel noResultsLabel = new JLabel("No users found matching your search.");
             noResultsLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -66,11 +73,24 @@ public class SearchResultsView {
             return panel;
         }
         
-        // Create list model for users
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        for (User user : users) {
-            listModel.addElement(user.getUsername() + " (" + user.getEmail() + ")");
-        }
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+   
         
         // Create JList with users
         JList<String> userList = new JList<>(listModel);
@@ -111,16 +131,21 @@ public class SearchResultsView {
         headerLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         panel.add(headerLabel, BorderLayout.NORTH);
         
+        // Debug output
+        System.out.println("Creating issues panel with " + issues.size() + " issues");
+        for (model.Issue issue : issues) {
+            System.out.println("Issue in panel: " + issue.getTitle() + " - " + issue.getStatus());
+        }
+        
         if (issues.isEmpty()) {
             JLabel noResultsLabel = new JLabel("No issues found matching your search.");
             noResultsLabel.setHorizontalAlignment(SwingConstants.CENTER);
             panel.add(noResultsLabel, BorderLayout.CENTER);
-            
             return panel;
         }
         
-        // Create table model for issues
-        String[] columnNames = {"Title", "Status", "Created By", "Likes", "Created At"};
+        // Create table model with issues data
+        String[] columnNames = {"Title", "Status", "Creator", "Likes", "Created At"};
         Object[][] data = new Object[issues.size()][5];
         
         for (int i = 0; i < issues.size(); i++) {
@@ -135,31 +160,13 @@ public class SearchResultsView {
             data[i][4] = issue.getCreatedAt();
         }
         
+        // Create JTable with issues
         JTable issuesTable = new JTable(data, columnNames);
-        issuesTable.setRowHeight(30);
-        issuesTable.getTableHeader().setReorderingAllowed(false);
-        issuesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        issuesTable.setFillsViewportHeight(true);
         
-        // Add mouse listener for clicking on issues
-        issuesTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int row = issuesTable.getSelectedRow();
-                    model.Issue selectedIssue = issues.get(row);
-                    openIssueDetails(selectedIssue);
-                }
-            }
-        });
-        
+        // Add table to a scroll pane
         JScrollPane scrollPane = new JScrollPane(issuesTable);
         panel.add(scrollPane, BorderLayout.CENTER);
-        
-        // Add instruction label
-        JLabel instructionLabel = new JLabel("Double-click an issue to view details");
-        instructionLabel.setForeground(Color.GRAY);
-        instructionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(instructionLabel, BorderLayout.SOUTH);
         
         return panel;
     }
@@ -184,7 +191,7 @@ public class SearchResultsView {
                        issuesSubmitted, likesReceived, commentsReceived, commentsMade);
     }
     
-    private void openIssueDetails(model.Issue issue) {
+    private  void openIssueDetails(model.Issue issue) {
         // Build a more comprehensive dialog with better formatting
         User creator = userController.getUserById(issue.getUserId());
         String creatorName = (creator != null) ? creator.getUsername() : "Unknown";
@@ -240,4 +247,5 @@ public class SearchResultsView {
             return label;
         }
     }
+    
 }
