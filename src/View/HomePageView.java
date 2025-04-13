@@ -16,7 +16,6 @@ import model.Report;
 import model.User;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.Cursor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +23,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomePageView {
@@ -295,14 +295,23 @@ topPanel.add(rightTop, BorderLayout.EAST);
         loadIssues();
     }
     
-    private void performSearch(String query) {
-        query = query.trim();
-        if (!query.isEmpty() && !query.equals("Search issues or users...")) {
-            // Create controller and perform search
-            UserController controller = new UserController();
-            new SearchResultsView(query, controller);
-        }
+ public void performSearch(String query) {
+    query = query.trim();
+    if (!query.isEmpty() && !query.equals("Search issues or users...")) {
+        // Add debug output
+        System.out.println("Searching for: " + query);
+        
+        // Create controller and perform search
+        UserController controller = new UserController();
+        
+        // Debug: Print number of results before showing the view
+        ArrayList<User> userResults = controller.searchUsers(query);
+        ArrayList<Issue> issueResults = controller.searchIssues(query);
+        System.out.println("Found " + userResults.size() + " users and " + issueResults.size() + " issues");
+        
+        new SearchResultsView(query, controller);
     }
+}
 
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);

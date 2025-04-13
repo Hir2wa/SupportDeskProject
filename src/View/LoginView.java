@@ -15,7 +15,6 @@ public class LoginView {
 
     public LoginView() {
         Color aucaBlue = new Color(0, 51, 153);
-
         loginFrame = new JFrame("Login - Support Desk");
         loginFrame.setSize(550, 650);
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

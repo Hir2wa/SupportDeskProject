@@ -185,17 +185,40 @@ public class SearchResultsView {
     }
     
     private void openIssueDetails(model.Issue issue) {
-        // This method would open your issue details view
-        // Assuming you have an IssueDetailView class
-        // new IssueDetailView(issue);
+        // Build a more comprehensive dialog with better formatting
+        User creator = userController.getUserById(issue.getUserId());
+        String creatorName = (creator != null) ? creator.getUsername() : "Unknown";
         
-        // For now, just show a dialog
-        JOptionPane.showMessageDialog(resultsFrame, 
-            "Issue: " + issue.getTitle() + "\n\n" + issue.getDescription(),
-            "Issue Details", 
-            JOptionPane.INFORMATION_MESSAGE);
+        String message = "<html><body style='width: 400px'>" +
+                        "<h2>" + issue.getTitle() + "</h2>" +
+                        "<p><b>Status:</b> " + issue.getStatus() + "</p>" +
+                        "<p><b>Created by:</b> " + creatorName + "</p>" +
+                        "<p><b>Posted on:</b> " + issue.getCreatedAt() + "</p>" +
+                        "<p><b>Description:</b><br>" + issue.getDescription() + "</p>" +
+                        "</body></html>";
+        
+        // Try creating a custom dialog instead of JOptionPane
+        JDialog detailDialog = new JDialog(resultsFrame, "Issue Details", true);
+        detailDialog.setLayout(new BorderLayout());
+        
+        JEditorPane contentPane = new JEditorPane("text/html", message);
+        contentPane.setEditable(false);
+        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JScrollPane scrollPane = new JScrollPane(contentPane);
+        detailDialog.add(scrollPane, BorderLayout.CENTER);
+        
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> detailDialog.dispose());
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(closeButton);
+        detailDialog.add(buttonPanel, BorderLayout.SOUTH);
+        
+        detailDialog.setSize(500, 400);
+        detailDialog.setLocationRelativeTo(resultsFrame);
+        detailDialog.setVisible(true);
     }
-    
     // Custom cell renderer for user list
     class UserListCellRenderer extends DefaultListCellRenderer {
         @Override

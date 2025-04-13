@@ -253,8 +253,10 @@ public java.util.ArrayList<User> searchUsers(String searchQuery) {
 }
 
 // 🔍 Search for issues by title or description
+// Check if your search SQL is correct and the pattern is being set properly
 public java.util.ArrayList<model.Issue> searchIssues(String searchQuery) {
-    String sql = "SELECT * FROM issues WHERE title LIKE ? OR description LIKE ?";
+    System.out.println("Searching for issues with query: " + searchQuery);
+    String sql = "SELECT * FROM issues WHERE title ILIKE ? OR description ILIKE ?";
     java.util.ArrayList<model.Issue> results = new java.util.ArrayList<>();
     
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -263,6 +265,7 @@ public java.util.ArrayList<model.Issue> searchIssues(String searchQuery) {
         stmt.setString(2, pattern);
         
         ResultSet rs = stmt.executeQuery();
+        System.out.println("Query executed");
         
         while (rs.next()) {
             model.Issue issue = new model.Issue(
@@ -276,14 +279,15 @@ public java.util.ArrayList<model.Issue> searchIssues(String searchQuery) {
             
             // Assuming there's a setLikes method in your Issue class
             issue.setLikes(rs.getInt("likes"));
-            
             results.add(issue);
+            System.out.println("Found issue: " + issue.getTitle());
         }
     } catch (SQLException e) {
-        System.out.println("⚠️ Search issues failed");
+        System.out.println("⚠️ Search issues failed: " + e.getMessage());
         e.printStackTrace();
     }
     
+    System.out.println("Total issues found: " + results.size());
     return results;
 }
 
