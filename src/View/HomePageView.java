@@ -49,10 +49,13 @@ public class HomePageView {
         this.reportController = new ReportController();
         this.userId = getUserIdFromUsername(username);
         
-  
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        homeFrame.setSize(900, 800);
+        
+        // Set the frame size to full screen
+        homeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
+        // Optional: Make sure it's in the center of the screen
         homeFrame.setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel();
