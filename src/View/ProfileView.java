@@ -15,7 +15,7 @@ public class ProfileView {
 
     public ProfileView(String username, String email, ImageIcon profilePic,
                        int issuesSubmitted, int likesReceived,
-                       int commentsReceived, int commentsMade) {
+                       int commentsReceived, int commentsMade, boolean allowEditing) {
 
         // ==== Frame Setup ====
         profileFrame = new JFrame("Profile - " + username);
@@ -44,33 +44,34 @@ public class ProfileView {
         gbc.anchor = GridBagConstraints.CENTER;
 
         // ==== Profile Picture ====
-       gbc.gridy = 0;
-JLabel profileLabel = new JLabel();
+        gbc.gridy = 0;
+        JLabel profileLabel = new JLabel();
 
-// Create a fallback image in case loading fails
-BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-Graphics2D g2d = fallbackImg.createGraphics();
-g2d.setColor(new Color(0, 102, 204));
-g2d.fillRect(0, 0, 100, 100);
-g2d.dispose();
-ImageIcon defaultPic = new ImageIcon(fallbackImg);
+        // Create a fallback image in case loading fails
+        BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = fallbackImg.createGraphics();
+        g2d.setColor(new Color(0, 102, 204));
+        g2d.fillRect(0, 0, 100, 100);
+        g2d.dispose();
+        ImageIcon defaultPic = new ImageIcon(fallbackImg);
 
-// Try to load from file system
-try {
-    File imageFile = new File("Assets/LogoSupportDesk.png");
-    if (imageFile.exists()) {
-        defaultPic = new ImageIcon(imageFile.getAbsolutePath());
-    }
-} catch (Exception ex) {
-    // Keep using the fallback image
-}
+        // Try to load from file system
+        try {
+            File imageFile = new File("Assets/LogoSupportDesk.png");
+            if (imageFile.exists()) {
+                defaultPic = new ImageIcon(imageFile.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            // Keep using the fallback image
+        }
 
-ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
+        ImageIcon finalProfilePic = (profilePic != null) ? profilePic : defaultPic;
 
-Image image = finalProfilePic.getImage();
-Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-profileLabel.setIcon(new ImageIcon(scaledImage));
-profilePanel.add(profileLabel, gbc);
+        Image image = finalProfilePic.getImage();
+        Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        profileLabel.setIcon(new ImageIcon(scaledImage));
+        profilePanel.add(profileLabel, gbc);
+        
         // ==== Username ====
         gbc.gridy++;
         JLabel usernameLabel = new JLabel("Username: " + username);
@@ -103,39 +104,46 @@ profilePanel.add(profileLabel, gbc);
 
         profilePanel.add(statsPanel, gbc);
 
-        // ==== Edit Profile Button ====
+        // ==== Edit Profile Button (Conditional) ====
         gbc.gridy++;
-        JButton editProfileButton = new JButton("Edit Profile");
-        editProfileButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        editProfileButton.setBackground(new Color(0, 102, 204));
-        editProfileButton.setForeground(Color.WHITE);
-        editProfileButton.setPreferredSize(new Dimension(150, 40));
-        profilePanel.add(editProfileButton, gbc);
+        if (allowEditing) {
+            JButton editProfileButton = new JButton("Edit Profile");
+            editProfileButton.setFont(new Font("Arial", Font.PLAIN, 14));
+            editProfileButton.setBackground(new Color(0, 102, 204));
+            editProfileButton.setForeground(Color.WHITE);
+            editProfileButton.setPreferredSize(new Dimension(150, 40));
+            profilePanel.add(editProfileButton, gbc);
+            
+            // ==== Edit Button Action ====
+            editProfileButton.addActionListener(e -> {
+                // Create UserController first
+                UserController controller = new UserController();
+                
+                // Look up the complete user from the database
+                User user = controller.getUserByUsername(username);
+                
+                if (user != null) {
+                    // Now we have the user with correct ID from database
+                    new EditProfilePageView(user, controller);
+                } else {
+                    JOptionPane.showMessageDialog(profileFrame, 
+                        "Error: Could not retrieve user data from database", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } else {
+            // Add a label indicating this is someone else's profile
+            JLabel viewOnlyLabel = new JLabel("Viewing " + username + "'s profile");
+            viewOnlyLabel.setFont(new Font("Arial", Font.ITALIC, 14));
+            viewOnlyLabel.setForeground(Color.GRAY);
+            profilePanel.add(viewOnlyLabel, gbc);
+        }
 
         // ==== Add Profile Panel to Main Panel ====
         mainPanel.add(profilePanel, BorderLayout.CENTER);
 
         profileFrame.setContentPane(mainPanel);
         profileFrame.setVisible(true);
-
-        // ==== Edit Button Action ====
-// In ProfileView's editProfileButton action listener:
-editProfileButton.addActionListener(e -> {
-    // Create UserController first
-    UserController controller = new UserController();
-    
-    // Look up the complete user from the database
-    User user = controller.getUserByUsername(username);
-    
-    if (user != null) {
-        // Now we have the user with correct ID from database
-        new EditProfilePageView(user, controller);
-    } else {
-        JOptionPane.showMessageDialog(profileFrame, 
-            "Error: Could not retrieve user data from database", 
-            "Error", 
-            JOptionPane.ERROR_MESSAGE);
-    }
-});
     }
 }

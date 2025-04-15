@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class UserController {
     private Connection connection;
-
+    private static int currentLoggedInUserId = -1;
     public UserController() {
         try {
             String url = "jdbc:postgresql://localhost:5432/support_desk";
@@ -40,7 +40,6 @@ public class UserController {
         }
     }
 
-    // ✅ Login (returns true for successful login)
     public boolean loginUser(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -51,7 +50,12 @@ public class UserController {
             if (rs.next()) {
                 String storedPass = rs.getString("password");
                 if (password.equals(storedPass)) {
-                    return true; // Return true if login is successful
+                    // If login successful, set the current user ID
+                    User user = getUserByUsername(username);
+                    if (user != null) {
+                        currentLoggedInUserId = user.getId();
+                        return true;
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -60,6 +64,13 @@ public class UserController {
         return false; // Return false if login fails
     }
 
+    public int getCurrentLoggedInUserId() {
+        return currentLoggedInUserId;
+    }
+
+    public void logout() {
+        currentLoggedInUserId = -1;
+    }
     // 📦 Fetch a user object by username
     public User getUserByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";

@@ -15,11 +15,15 @@ public class SearchResultsView {
     private UserController userController;
     private JTabbedPane tabbedPane;
     private String searchQuery;
+    private int currentLoggedInUserId;
+
 
     public SearchResultsView(String searchQuery, UserController controller) {
         this.searchQuery = searchQuery;
         this.userController = controller;
-        
+        this.searchQuery = searchQuery;
+        this.userController = controller;
+        this.currentLoggedInUserId = controller.getCurrentLoggedInUserId();
         // Create and set up the frame
         resultsFrame = new JFrame("Search Results for: " + searchQuery);
         resultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -170,26 +174,32 @@ public class SearchResultsView {
         
         return panel;
     }
+// In the SearchResultsView class, modify the openUserProfile method:
+
+private void openUserProfile(User user) {
+    // Calculate stats for user
+    int issuesSubmitted = userController.countIssuesByUserId(user.getId());
+    int likesReceived = userController.countLikesReceivedByUserId(user.getId());
+    int commentsReceived = userController.countCommentsReceivedByUserId(user.getId());
+    int commentsMade = userController.countCommentsMadeByUserId(user.getId());
     
-    private void openUserProfile(User user) {
-        // Calculate stats for user
-        int issuesSubmitted = userController.countIssuesByUserId(user.getId());
-        int likesReceived = userController.countLikesReceivedByUserId(user.getId());
-        int commentsReceived = userController.countCommentsReceivedByUserId(user.getId());
-        int commentsMade = userController.countCommentsMadeByUserId(user.getId());
-        
-        // Create a default profile picture 
-        BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = fallbackImg.createGraphics();
-        g2d.setColor(new Color(0, 102, 204));
-        g2d.fillRect(0, 0, 100, 100);
-        g2d.dispose();
-        ImageIcon profilePic = new ImageIcon(fallbackImg);
-        
-        // Open the profile view
-        new ProfileView(user.getUsername(), user.getEmail(), profilePic, 
-                       issuesSubmitted, likesReceived, commentsReceived, commentsMade);
-    }
+    // Create a default profile picture 
+    BufferedImage fallbackImg = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2d = fallbackImg.createGraphics();
+    g2d.setColor(new Color(0, 102, 204));
+    g2d.fillRect(0, 0, 100, 100);
+    g2d.dispose();
+    ImageIcon profilePic = new ImageIcon(fallbackImg);
+    
+    // Get the currently logged in user's ID (you need to pass this to SearchResultsView)
+    int currentLoggedInUserId = userController.getCurrentLoggedInUserId();
+    
+    // Open the profile view in read-only mode (no edit button) if it's not the current user
+    boolean isCurrentUser = (currentLoggedInUserId == user.getId());
+    
+    new ProfileView(user.getUsername(), user.getEmail(), profilePic, 
+                   issuesSubmitted, likesReceived, commentsReceived, commentsMade, isCurrentUser);
+}
     
     private  void openIssueDetails(model.Issue issue) {
         // Build a more comprehensive dialog with better formatting

@@ -121,12 +121,13 @@ public void actionPerformed(ActionEvent e) {
 
      
         new ProfileView(user.getUsername(), user.getEmail(), finalProfilePic,
-                        issuesSubmitted, likesReceived, commentsReceived, commentsMade);
+                        issuesSubmitted, likesReceived, commentsReceived, commentsMade, false);
     } else {
         JOptionPane.showMessageDialog(homeFrame, "User info not found!", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
         });
+
         
         
 // Create search field with placeholder text
@@ -185,7 +186,29 @@ rightTop.add(searchPanel);  // Added searchPanel instead of just searchField
 topPanel.add(leftTop, BorderLayout.WEST);
 topPanel.add(rightTop, BorderLayout.EAST);
 
+// In the HomePageView constructor, right after you create the profileButton
+JButton signOutButton = new JButton("Sign Out");
+signOutButton.setFocusPainted(false);
+signOutButton.setFont(new Font("Arial", Font.PLAIN, 12));
+signOutButton.setForeground(Color.WHITE);
+signOutButton.setBackground(new Color(220, 53, 69)); // Red color
+signOutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+signOutButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
+signOutButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Close the home page
+        homeFrame.dispose();
+        
+        // Open login view
+        new LoginView();
+    }
+});
+
+// Then add the button to the leftTop panel after the profileButton
+leftTop.add(profileButton);
+leftTop.add(signOutButton);
 
 
     
