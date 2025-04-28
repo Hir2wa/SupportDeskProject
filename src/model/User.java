@@ -10,6 +10,8 @@ public class User {
     private String password;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private boolean isAdmin;
+    private boolean isBlocked;
     
     // Constructors
     public User() {}
@@ -20,6 +22,17 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+    
+
+    public User(int id, String fullName, String username, String email, String password, boolean isAdmin, boolean isBlocked) {
+        this.id = id;
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.isAdmin = isAdmin;
+        this.isBlocked = isBlocked;
     }
     
     public User(String fullName, String username, String email, String password) {
@@ -84,5 +97,20 @@ public class User {
     
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+    
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+    
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+    
+    public void setBlocked(boolean isBlocked) {
+        this.isBlocked = isBlocked;
     }
 }

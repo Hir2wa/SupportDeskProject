@@ -19,9 +19,13 @@ public class RegisterView {
         Color aucaBlue = new Color(0, 51, 153);
 
         registerFrame = new JFrame("Register - Support Desk");
-        registerFrame.setSize(550, 650);
+        registerFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         registerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         registerFrame.setLocationRelativeTo(null);
+
+
+     
+
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));

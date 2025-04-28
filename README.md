@@ -47,3 +47,37 @@ SupportDesk/
 │ └── Session.java (holds current logged-in user)
 │
 └── Main.java
+
+RMI stands for remote method invocation is one of the technology being used in java to develop a sistributed application where we have a server and client and both are able to communicate over the network.
+N.B inorder server and client to communicate they have to use Gateway where client side use STUB ans SKELETON on the server side
+
+1. STUB (cliesnt side)
+   a. It initiate the communacation with server
+   b. It has to invoke / call / disturb methos exposed by the server
+   c. It has to wait the feedback from server side.
+   d. It has to communicate the feedvak to the client
+
+2.Skeleton (Server side)
+
+a. It accept /reject incoming request from the client side.
+
+A.steps to configure client side
+1.import required libraries
+2.create pojo classess without java persistance annotation and it should implement serializable
+3.create jaca interface
+
+//method signature or definition
+// return type methodName(par)
+
+where every pojo will have it's method
+
+//setting server controller
+//configure the properties
+system.setProperty
+//on serverside you create a registry on client to registre
+//registry registry = laca teREgistry.createREgisty
+tyr and catcy
+if used used bind inn the middle of the they lost connection everything is down
+but rebinnd if lose connention you will reconnect
+you do all for all methods
+registry.rebind("address" ,addreesImplementation)

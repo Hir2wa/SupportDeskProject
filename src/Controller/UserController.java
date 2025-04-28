@@ -40,29 +40,46 @@ public class UserController {
         }
     }
 
-    public boolean loginUser(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String storedPass = rs.getString("password");
-                if (password.equals(storedPass)) {
-                    // If login successful, set the current user ID
-                    User user = getUserByUsername(username);
-                    if (user != null) {
-                        currentLoggedInUserId = user.getId();
-                        return true;
-                    }
-                }
+   public User loginAndGetUser(String username, String password) {
+    String sql = "SELECT * FROM users WHERE username = ?";
+    
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setString(1, username);
+        ResultSet rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            String storedPass = rs.getString("password");
+            if (password.equals(storedPass)) {
+                // If login successful, create and return the user object
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("full_name"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password"),
+                    rs.getBoolean("is_admin"),
+                    rs.getBoolean("is_blocked")
+                );
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                
+                // Also set the current logged in user ID
+                currentLoggedInUserId = user.getId();
+                
+                return user;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false; // Return false if login fails
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return null; // Return null if login fails
+}
+
+// Keep the existing method for backward compatibility
+public boolean loginUser(String username, String password) {
+    User user = loginAndGetUser(username, password);
+    return user != null;
+}
 
     public int getCurrentLoggedInUserId() {
         return currentLoggedInUserId;

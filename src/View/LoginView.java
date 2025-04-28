@@ -1,6 +1,7 @@
 package View;
 
 import Controller.UserController;
+import model.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -75,12 +76,18 @@ public class LoginView {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
                 UserController userController = new UserController();
-                boolean success = userController.loginUser(username, password); // Assuming you have a loginUser method
+                User loggedInUser = userController.loginAndGetUser(username, password);
 
-                if (success) {
-                    // Close LoginView and open HomePageView
+                if (loggedInUser != null) {
                     loginFrame.dispose(); // Close current window
-                    new HomePageView(username, null); // Open HomePageView with username
+                    
+                    if (loggedInUser.isAdmin()) {
+                        // Open Admin Dashboard if user is an admin
+                        new AdminDashboardView(loggedInUser);
+                    } else {
+                        // Open regular user home page
+                        new HomePageView(username, null);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(loginFrame, "Invalid credentials. Please try again.");
                 }

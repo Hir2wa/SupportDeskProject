@@ -5,9 +5,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.text.SimpleDateFormat;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import Controller.IssueController;
 import Controller.ReportController;
@@ -27,7 +24,9 @@ import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HomePageView {
 
@@ -51,11 +50,7 @@ public class HomePageView {
         
         homeFrame = new JFrame("Support Desk - Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // Set the frame size to full screen
         homeFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
-        // Optional: Make sure it's in the center of the screen
         homeFrame.setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel();
@@ -122,7 +117,6 @@ public class HomePageView {
             }
         });
 
-        // Create search field with placeholder text
         JTextField searchField = new JTextField("Search issues or users...");
         styleTextField(searchField);
         searchField.addFocusListener(new FocusListener() {
@@ -140,7 +134,6 @@ public class HomePageView {
             }
         });
 
-        // Add key listener to search when Enter is pressed
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -150,7 +143,6 @@ public class HomePageView {
             }
         });
 
-        // Create search button
         JButton searchButton = new JButton("🔍");
         searchButton.setFocusPainted(false);
         searchButton.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -159,7 +151,6 @@ public class HomePageView {
         searchButton.setForeground(Color.WHITE);
         searchButton.addActionListener(e -> performSearch(searchField.getText()));
 
-        // Create a panel to hold the search field and button
         JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
         searchPanel.setOpaque(false);
         searchPanel.add(searchField, BorderLayout.CENTER);
@@ -212,7 +203,9 @@ public class HomePageView {
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         newPostPanel.setBackground(Color.WHITE);
+        newPostPanel.setPreferredSize(new Dimension(600, 200)); // Set reasonable width
         newPostPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        newPostPanel.setVisible(true); // Ensure visibility
         
         JTextArea newPostTextArea = new JTextArea(4, 50);
         newPostTextArea.setWrapStyleWord(true);
@@ -226,6 +219,7 @@ public class HomePageView {
         JScrollPane postScrollPane = new JScrollPane(newPostTextArea);
         postScrollPane.setBorder(BorderFactory.createEmptyBorder());
         postScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        postScrollPane.setPreferredSize(new Dimension(600, 100)); // Ensure scroll pane has width
 
         JButton postButton = createStyledButton("Post New Issue", accentColor);
         postButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -258,9 +252,12 @@ public class HomePageView {
         postsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
         postsContainerPanel.add(postsScrollPane, BorderLayout.CENTER);
 
+        System.out.println("Adding newPostPanel to centerPanel");
         centerPanel.add(newPostPanel);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         centerPanel.add(postsContainerPanel);
+        centerPanel.revalidate();
+        centerPanel.repaint();
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(centerPanel, BorderLayout.CENTER);
@@ -281,8 +278,11 @@ public class HomePageView {
                     boolean posted = issueController.postIssue(newIssue, userId);
                     
                     if (posted) {
+                        System.out.println("Issue posted with ID: " + newIssue.getId());
                         loadIssues();
                         newPostTextArea.setText("");
+                        newPostPanel.revalidate();
+                        newPostPanel.repaint();
                         JOptionPane.showMessageDialog(homeFrame, "Issue posted successfully!");
                     } else {
                         JOptionPane.showMessageDialog(homeFrame, 
@@ -349,8 +349,18 @@ public class HomePageView {
         postsPanel.removeAll();
         
         List<Issue> issues = issueController.getAllIssues();
+        Set<Integer> seenIssueIds = new HashSet<>(); // Deduplicate issues
+        List<Issue> uniqueIssues = new ArrayList<>();
         
-        if (issues.isEmpty()) {
+        System.out.println("Loaded issues: " + issues.size());
+        for (Issue issue : issues) {
+            if (seenIssueIds.add(issue.getId())) {
+                uniqueIssues.add(issue);
+                System.out.println("Issue ID: " + issue.getId() + ", Description: " + issue.getDescription());
+            }
+        }
+        
+        if (uniqueIssues.isEmpty()) {
             JLabel noIssuesLabel = new JLabel("No issues found. Be the first to post one!");
             noIssuesLabel.setFont(new Font("Arial", Font.ITALIC, 14));
             noIssuesLabel.setForeground(new Color(100, 100, 100));
@@ -359,7 +369,7 @@ public class HomePageView {
             postsPanel.add(noIssuesLabel);
             postsPanel.add(Box.createVerticalGlue());
         } else {
-            for (Issue issue : issues) {
+            for (Issue issue : uniqueIssues) {
                 String posterUsername;
                 if (issue.getUserId() == userId) {
                     posterUsername = username;
@@ -413,7 +423,8 @@ public class HomePageView {
             new LineBorder(new Color(220, 220, 220), 1, true),
             new EmptyBorder(15, 15, 15, 15)
         ));
-        postPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
+        postPanel.setPreferredSize(new Dimension(500, 400)); // Set reasonable width
+        postPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
         postPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JTextArea postContent = new JTextArea(postText);
@@ -423,11 +434,12 @@ public class HomePageView {
         postContent.setEditable(false);
         postContent.setBackground(Color.WHITE);
         postContent.setBorder(BorderFactory.createEmptyBorder());
+        postContent.setPreferredSize(new Dimension(600, 50)); // Ensure content stretches
 
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         infoPanel.setBackground(lightGray);
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 8, 5, 8));
-        infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+       infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 10));
         
         JLabel userIconLabel = new JLabel("👤");
         userIconLabel.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -439,7 +451,6 @@ public class HomePageView {
         infoPanel.add(postInfo);
         infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Add delete button for the user's own issue
         Issue issue = issueController.getIssueById(issueId);
         if (issue != null && issue.getUserId() == userId) {
             JButton deleteIssueButton = new JButton("Delete 🗑️");
@@ -448,7 +459,7 @@ public class HomePageView {
             deleteIssueButton.setContentAreaFilled(true);
             deleteIssueButton.setBackground(new Color(220, 53, 69));
             deleteIssueButton.setForeground(Color.WHITE);
-            deleteIssueButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+           deleteIssueButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
             deleteIssueButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
             deleteIssueButton.setFont(new Font("Arial", Font.PLAIN, 12));
 
@@ -476,6 +487,7 @@ public class HomePageView {
             infoWrapper.add(deleteIssueButton, BorderLayout.EAST);
             infoWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
             infoPanel = infoWrapper;
+    
         }
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
@@ -518,7 +530,7 @@ public class HomePageView {
             dislikeButton.setForeground(Color.WHITE);
         } else {
             dislikeButton.setBackground(new Color(240, 240, 240));
-            dislikeButton.setForeground(new Color(60, 60, 60));
+            likeButton.setForeground(new Color(60, 60, 60));
         }
 
         reportButton.setBackground(new Color(240, 240, 240));
@@ -713,7 +725,7 @@ public class HomePageView {
         return postPanel;
      }
 
-       private void extracted(String username, int issueId, JPanel commentSectionPanel, JTextField commentInput) {
+    private void extracted(String username, int issueId, JPanel commentSectionPanel, JTextField commentInput) {
         String commentText = commentInput.getText().trim();
         if (!commentText.isEmpty()) {
             Comment comment = new Comment();
@@ -742,6 +754,7 @@ public class HomePageView {
             }
         }
     }
+
     private JPanel createCommentPanel(Comment comment, String username) {
         JPanel commentPanel = new JPanel();
         commentPanel.setLayout(new BorderLayout());
@@ -776,7 +789,6 @@ public class HomePageView {
         reportCommentButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         reportCommentButton.addActionListener(e -> {
-      
             if (reportController.hasUserReportedComment(userId, comment.getId())) {
                 JOptionPane.showMessageDialog(homeFrame, 
                     "You have already reported this comment.", 
@@ -784,7 +796,6 @@ public class HomePageView {
                 return;
             }
             
-          
             showReportDialog(null, comment.getId());
         });
         
@@ -796,7 +807,6 @@ public class HomePageView {
         return commentPanel;
     }
     
-  
     private void showReportDialog(Integer issueId, Integer commentId) {
         JDialog reportDialog = new JDialog(homeFrame, "Report", true);
         reportDialog.setSize(400, 300);
@@ -862,11 +872,11 @@ public class HomePageView {
         dialogPanel.add(detailsScroll);
         dialogPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         dialogPanel.add(buttonPanel);
+        
         cancelButton.addActionListener(e -> reportDialog.dispose());
         submitButton.addActionListener(e -> {
             String selectedReason = (String) reasonComboBox.getSelectedItem();
             
-         
             if (selectedReason == null || selectedReason.equals("Select a reason...")) {
                 JOptionPane.showMessageDialog(reportDialog, 
                     "Please select a reason for your report.", 
@@ -874,14 +884,12 @@ public class HomePageView {
                 return;
             }
         
-          
             String fullReason = selectedReason;
             String additionalDetails = detailsArea.getText().trim();
             
             if (!additionalDetails.isEmpty()) {
                 fullReason += ": " + additionalDetails;
             }
-            
 
             if (issueId == null && commentId == null) {
                 JOptionPane.showMessageDialog(reportDialog, 
@@ -892,13 +900,9 @@ public class HomePageView {
             
             try {
                 boolean success = false;
-        
-             
                 if (issueId != null) {
-                 
                     success = reportController.reportIssue(userId, issueId, fullReason); 
                 } else if (commentId != null) {
-                  
                     success = reportController.reportComment(userId, commentId, fullReason); 
                 }
         
@@ -919,22 +923,16 @@ public class HomePageView {
                     "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
         User loggedInUser = userController.getUserByUsername(username);
-// Check that the user has a valid ID
-if (loggedInUser != null && loggedInUser.getId() > 0) {
-    // Proceed with the application
-} else {
-    // Handle error
-}
+        if (loggedInUser != null && loggedInUser.getId() > 0) {
+            // Proceed with the application
+        } else {
+            JOptionPane.showMessageDialog(homeFrame, "Invalid user session.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-reportDialog.setContentPane(dialogPanel);
-reportDialog.setVisible(true);
-
-       
+        reportDialog.setContentPane(dialogPanel);
+        reportDialog.setVisible(true);
     }
-    // After successful login validation
-
-    
-   
-   
 }

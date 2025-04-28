@@ -207,100 +207,105 @@ public class AdminController {
      * Get all users in the system
      * @return List of users
      */
-    // public List<User> getAllUsers() {
-    //     List<User> users = new ArrayList<>();
-    //     String sql = "SELECT * FROM users ORDER BY id";
-        
-    //     try (Statement stmt = connection.createStatement();
-    //          ResultSet rs = stmt.executeQuery(sql)) {
-            
-    //         while (rs.next()) {
-    //             User user = new User(
-    //                 rs.getInt("id"),
-    //                 rs.getString("full_name"),
-    //                 rs.getString("username"),
-    //                 rs.getString("email"),
-    //                 rs.getString("password")
-    //             );
-    //             user.setCreatedAt(rs.getTimestamp("created_at"));
-    //             user.setUpdatedAt(rs.getTimestamp("updated_at"));
-    //             // Check if the status column exists and set it if it does
-    //             try {
-    //                 user.setStatus(rs.getString("status"));
-    //             } catch (SQLException e) {
-    //                 // Status column might not exist in your current schema
-    //                 user.setStatus("active"); // Default value
-    //             }
-    //             users.add(user);
-    //         }
-    //     } catch (SQLException e) {
-    //         System.out.println("❌ Failed to get users");
-    //         e.printStackTrace();
-    //     }
-        
-    //     return users;
-    // }
+
+     /**
+ * Get all users in the system
+ * @return List of users
+ */
+
+
+
+
+ public model.AdminStats getSystemStats() {
+    model.AdminStats stats = new model.AdminStats();
     
-    /**
-     * Get system statistics for admin dashboard
-     * @return Object containing system statistics
-     */
-    public AdminStats getSystemStats() {
-        AdminStats stats = new AdminStats();
-        
-        try {
-            // Total users
-            String userSql = "SELECT COUNT(*) FROM users";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(userSql)) {
-                if (rs.next()) {
-                    stats.setTotalUsers(rs.getInt(1));
-                }
+    try {
+        // Total users
+        String userSql = "SELECT COUNT(*) FROM users";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(userSql)) {
+            if (rs.next()) {
+                stats.setTotalUsers(rs.getInt(1));
             }
-            
-            // Total issues
-            String issueSql = "SELECT COUNT(*) FROM issues";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(issueSql)) {
-                if (rs.next()) {
-                    stats.setTotalIssues(rs.getInt(1));
-                }
-            }
-            
-            // Total comments
-            String commentSql = "SELECT COUNT(*) FROM comments";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(commentSql)) {
-                if (rs.next()) {
-                    stats.setTotalComments(rs.getInt(1));
-                }
-            }
-            
-            // Active reports
-            String reportSql = "SELECT COUNT(*) FROM reports";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(reportSql)) {
-                if (rs.next()) {
-                    stats.setActiveReports(rs.getInt(1));
-                }
-            }
-            
-            // Recent activity - issues created in the last 7 days
-            String recentActivitySql = "SELECT COUNT(*) FROM issues WHERE created_at >= NOW() - INTERVAL '7 days'";
-            try (Statement stmt = connection.createStatement();
-                 ResultSet rs = stmt.executeQuery(recentActivitySql)) {
-                if (rs.next()) {
-                    stats.setRecentActivity(rs.getInt(1));
-                }
-            }
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Failed to get system stats");
-            e.printStackTrace();
         }
         
-        return stats;
+        // Total issues
+        String issueSql = "SELECT COUNT(*) FROM issues";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(issueSql)) {
+            if (rs.next()) {
+                stats.setTotalIssues(rs.getInt(1));
+            }
+        }
+        
+        // Total comments
+        String commentSql = "SELECT COUNT(*) FROM comments";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(commentSql)) {
+            if (rs.next()) {
+                stats.setTotalComments(rs.getInt(1));
+            }
+        }
+        
+        // Active reports
+        String reportSql = "SELECT COUNT(*) FROM reports";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(reportSql)) {
+            if (rs.next()) {
+                stats.setActiveReports(rs.getInt(1));
+            }
+        }
+        
+        // Recent activity - issues created in the last 7 days
+        String recentActivitySql = "SELECT COUNT(*) FROM issues WHERE created_at >= NOW() - INTERVAL '7 days'";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(recentActivitySql)) {
+            if (rs.next()) {
+                stats.setRecentActivity(rs.getInt(1));
+            }
+        }
+        
+    } catch (SQLException e) {
+        System.out.println("❌ Failed to get system stats");
+        e.printStackTrace();
     }
+    
+    return stats;
+}
+
+
+
+public List<User> getAllUsers() {
+    List<User> users = new ArrayList<>();
+    String sql = "SELECT * FROM users ORDER BY id";
+    
+    try (Statement stmt = connection.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+        
+        while (rs.next()) {
+            User user = new User(
+                rs.getInt("id"),
+                rs.getString("full_name"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password"),
+                rs.getBoolean("is_admin"),
+                rs.getBoolean("is_blocked")
+            );
+            user.setCreatedAt(rs.getTimestamp("created_at"));
+            user.setUpdatedAt(rs.getTimestamp("updated_at"));
+            users.add(user);
+        }
+    } catch (SQLException e) {
+        System.out.println("❌ Failed to get users");
+        e.printStackTrace();
+    }
+    
+    return users;
+}
+  
+    
+    // Removed duplicate method to resolve the issue
     
     // Inner class to hold system statistics
     public class AdminStats {
